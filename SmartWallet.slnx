@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="Architecture.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="SmartWallet.Application/SmartWallet.Application.csproj" />
+    <Project Path="SmartWallet.Domain/SmartWallet.Domain.csproj" />
+    <Project Path="SmartWallet.Infrastructure/SmartWallet.Infrastructure.csproj" />
+    <Project Path="SmartWallet.Web/SmartWallet.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="SmartWallet.IntegrationTests/SmartWallet.IntegrationTests.csproj" />
+    <Project Path="SmartWallet.UnitTests/SmartWallet.UnitTests.csproj" />
+  </Folder>
+</Solution>
