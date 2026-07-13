@@ -1,0 +1,67 @@
+﻿@model SmartWallet.Application.DTOs.Categories.CategoryDto
+
+@{
+    ViewData["Title"] = "Excluir Categoria";
+}
+
+<div class="container">
+
+    <div class="card shadow-sm border-danger">
+
+        <div class="card-header bg-danger text-white">
+
+            <h3 class="mb-0">
+                Excluir Categoria
+            </h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <p class="lead">
+                Tem certeza que deseja excluir esta categoria?
+            </p>
+
+            <dl class="row">
+
+                <dt class="col-sm-3">
+                    Nome
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Name
+                </dd>
+
+                <dt class="col-sm-3">
+                    Descrição
+                </dt>
+
+                <dd class="col-sm-9">
+                    @Model.Description
+                </dd>
+
+            </dl>
+
+            <form asp-action="Delete" method="post">
+
+                <input type="hidden"
+                       name="id"
+                       value="@Model.Id" />
+
+                <button type="submit"
+                        class="btn btn-danger">
+                    Excluir
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Cancelar
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

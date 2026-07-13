@@ -1,0 +1,32 @@
+﻿@model SmartWallet.Web.ViewModels.Categories.CategoryFormViewModel
+@{
+    ViewData["Title"] = "Nova Categoria";
+}
+
+<h1>Nova Categoria</h1>
+
+<hr />
+
+<form asp-action="Create" method="post">
+
+    <partial name="_CategoryForm" />
+
+    <div class="mt-4">
+
+        <button type="submit"
+                class="btn btn-primary">
+            Salvar
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </div>
+
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

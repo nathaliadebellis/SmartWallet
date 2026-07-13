@@ -1,0 +1,56 @@
+﻿@model SmartWallet.Web.ViewModels.Categories.CategoryFormViewModel
+
+@{
+    ViewData["Title"] = "Editar Categoria";
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            <i class="bi bi-pencil-square"></i>
+            Editar Categoria
+        </h1>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Voltar
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                <input asp-for="Id" type="hidden" />
+
+                <partial name="_CategoryForm" />
+
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i>
+                        Salvar Alterações
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

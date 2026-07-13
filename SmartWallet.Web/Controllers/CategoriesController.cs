@@ -1,0 +1,118 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using SmartWallet.Application.DTOs.Categories;
+using SmartWallet.Application.Interfaces;
+using SmartWallet.Web.ViewModels.Categories;
+
+namespace SmartWallet.Web.Controllers;
+
+public class CategoriesController : Controller
+{
+    private readonly ICategoryService _categoryService;
+
+    public CategoriesController(ICategoryService categoryService)
+    {
+        _categoryService = categoryService;
+    }
+
+
+    public async Task<IActionResult> Index()
+    {
+        var categories = await _categoryService.GetAllAsync();
+
+        return View(categories);
+    }
+
+
+    [HttpGet]
+    public IActionResult Create()
+    {
+        return View(new CategoryFormViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(CategoryFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var dto = new CreateCategoryDto
+        {
+            Name = model.Name,
+            Description = model.Description,
+            Icon = model.Icon,
+            Color = model.Color
+        };
+
+        await _categoryService.CreateAsync(dto);
+
+        TempData["Success"] = "Categoria criada com sucesso.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var category = await _categoryService.GetByIdAsync(id);
+
+        if (category is null)
+            return NotFound();
+
+        var model = new CategoryFormViewModel
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            Icon = category.Icon,
+            Color = category.Color
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(CategoryFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var dto = new UpdateCategoryDto
+        {
+            Id = model.Id,
+            Name = model.Name,
+            Description = model.Description,
+            Icon = model.Icon,
+            Color = model.Color
+        };
+
+        await _categoryService.UpdateAsync(dto);
+
+        TempData["Success"] = "Categoria atualizada com sucesso.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var category = await _categoryService.GetByIdAsync(id);
+
+        if (category is null)
+            return NotFound();
+
+        return View(category);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await _categoryService.DeleteAsync(id);
+
+        TempData["Success"] = "Categoria removida com sucesso.";
+
+        return RedirectToAction(nameof(Index));
+    }
+}
