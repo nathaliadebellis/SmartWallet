@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SmartWallet.Domain.Entities;
+using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Interfaces;
 using SmartWallet.Infrastructure.Data;
 
@@ -18,6 +19,16 @@ public class CategoryRepository : ICategoryRepository
     {
         return await _context.Categories
             .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Category>> GetByTransactionTypeAsync(
+        TransactionType transactionType)
+    {
+        return await _context.Categories
+            .AsNoTracking()
+            .Where(c => c.TransactionType == transactionType)
             .OrderBy(c => c.Name)
             .ToListAsync();
     }

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/docs/">
     <File Path="Architecture.md" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="SmartWallet.Application/SmartWallet.Application.csproj" />

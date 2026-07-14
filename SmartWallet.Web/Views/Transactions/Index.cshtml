@@ -1,0 +1,137 @@
+﻿@model IEnumerable<SmartWallet.Application.DTOs.FinancialTransactions.FinancialTransactionDto>
+
+@using SmartWallet.Domain.Enums
+
+@{
+    ViewData["Title"] = "Transações";
+}
+
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h1>
+            <i class="bi bi-cash-stack"></i>
+            Transações
+        </h1>
+
+        <a asp-action="Create"
+           class="btn btn-primary">
+
+            <i class="bi bi-plus-circle"></i>
+            Nova Transação
+
+        </a>
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+
+            Nenhuma transação cadastrada.
+
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Data</th>
+
+                            <th>Descrição</th>
+
+                            <th>Categoria</th>
+
+                            <th>Tipo</th>
+
+                            <th class="text-end">Valor</th>
+
+                            <th class="text-center">Ações</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var transaction in Model)
+                        {
+                            <tr>
+
+                                <td>
+                                    @transaction.TransactionDate.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    @transaction.Description
+                                </td>
+
+                                <td>
+                                    @transaction.CategoryName
+                                </td>
+
+                                <td>
+
+                                    @if (transaction.Type == TransactionType.Income)
+                                    {
+                                        <span class="badge bg-success">
+                                            Receita
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+                                            Despesa
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-end fw-semibold">
+
+                                    @transaction.Amount.ToString("C")
+
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@transaction.Id"
+                                       class="btn btn-sm btn-outline-warning">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@transaction.Id"
+                                       class="btn btn-sm btn-outline-danger ms-1">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+</div>

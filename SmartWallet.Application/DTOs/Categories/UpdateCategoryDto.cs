@@ -1,4 +1,6 @@
-﻿namespace SmartWallet.Application.DTOs.Categories;
+﻿using SmartWallet.Domain.Enums;
+
+namespace SmartWallet.Application.DTOs.Categories;
 
 public class UpdateCategoryDto
 {
@@ -11,4 +13,6 @@ public class UpdateCategoryDto
     public string? Icon { get; init; }
 
     public string? Color { get; init; }
+
+    public TransactionType TransactionType { get; set; }
 }

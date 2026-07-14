@@ -1,6 +1,7 @@
 ﻿using SmartWallet.Application.DTOs.Categories;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Domain.Entities;
+using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Interfaces;
 
 namespace SmartWallet.Application.Services;
@@ -17,6 +18,15 @@ public class CategoryService : ICategoryService
     public async Task<IEnumerable<CategoryDto>> GetAllAsync()
     {
         var categories = await _categoryRepository.GetAllAsync();
+
+        return categories.Select(MapToDto);
+    }
+
+    public async Task<IEnumerable<CategoryDto>> GetByTransactionTypeAsync(
+        TransactionType transactionType)
+    {
+        var categories = await _categoryRepository
+            .GetByTransactionTypeAsync(transactionType);
 
         return categories.Select(MapToDto);
     }
@@ -40,6 +50,7 @@ public class CategoryService : ICategoryService
 
         var category = new Category(
             dto.Name,
+            dto.TransactionType,
             dto.Description,
             dto.Icon,
             dto.Color);
@@ -63,6 +74,7 @@ public class CategoryService : ICategoryService
 
         category.Update(
             dto.Name,
+            dto.TransactionType,
             dto.Description,
             dto.Icon,
             dto.Color);
@@ -81,7 +93,6 @@ public class CategoryService : ICategoryService
         await _categoryRepository.DeleteAsync(category);
     }
 
-
     private static CategoryDto MapToDto(Category category)
     {
         return new CategoryDto
@@ -90,7 +101,8 @@ public class CategoryService : ICategoryService
             Name = category.Name,
             Description = category.Description,
             Icon = category.Icon,
-            Color = category.Color
+            Color = category.Color,
+            TransactionType = category.TransactionType
         };
     }
 }

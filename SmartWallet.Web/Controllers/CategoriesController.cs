@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartWallet.Application.DTOs.Categories;
 using SmartWallet.Application.Interfaces;
+using SmartWallet.Domain.Enums;
 using SmartWallet.Web.ViewModels.Categories;
 
 namespace SmartWallet.Web.Controllers;
@@ -14,7 +16,6 @@ public class CategoriesController : Controller
         _categoryService = categoryService;
     }
 
-
     public async Task<IActionResult> Index()
     {
         var categories = await _categoryService.GetAllAsync();
@@ -22,11 +23,14 @@ public class CategoriesController : Controller
         return View(categories);
     }
 
-
     [HttpGet]
     public IActionResult Create()
     {
-        return View(new CategoryFormViewModel());
+        var model = new CategoryFormViewModel();
+
+        LoadTransactionTypes(model);
+
+        return View(model);
     }
 
     [HttpPost]
@@ -34,14 +38,18 @@ public class CategoriesController : Controller
     public async Task<IActionResult> Create(CategoryFormViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            LoadTransactionTypes(model);
             return View(model);
+        }
 
         var dto = new CreateCategoryDto
         {
             Name = model.Name,
             Description = model.Description,
             Icon = model.Icon,
-            Color = model.Color
+            Color = model.Color,
+            TransactionType = model.TransactionType
         };
 
         await _categoryService.CreateAsync(dto);
@@ -65,8 +73,11 @@ public class CategoriesController : Controller
             Name = category.Name,
             Description = category.Description,
             Icon = category.Icon,
-            Color = category.Color
+            Color = category.Color,
+            TransactionType = category.TransactionType
         };
+
+        LoadTransactionTypes(model);
 
         return View(model);
     }
@@ -76,7 +87,10 @@ public class CategoriesController : Controller
     public async Task<IActionResult> Edit(CategoryFormViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            LoadTransactionTypes(model);
             return View(model);
+        }
 
         var dto = new UpdateCategoryDto
         {
@@ -84,7 +98,8 @@ public class CategoriesController : Controller
             Name = model.Name,
             Description = model.Description,
             Icon = model.Icon,
-            Color = model.Color
+            Color = model.Color,
+            TransactionType = model.TransactionType
         };
 
         await _categoryService.UpdateAsync(dto);
@@ -114,5 +129,41 @@ public class CategoriesController : Controller
         TempData["Success"] = "Categoria removida com sucesso.";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    private static void LoadTransactionTypes(CategoryFormViewModel model)
+    {
+        model.TransactionTypes = Enum
+            .GetValues<TransactionType>()
+            .Select(type => new SelectListItem
+            {
+                Value = type.ToString(),
+                Text = GetTransactionTypeDisplayName(type)
+            });
+    }
+
+    private static string GetTransactionTypeDisplayName(TransactionType type)
+    {
+        return type switch
+        {
+            TransactionType.Income => "Receita",
+            TransactionType.Expense => "Despesa",
+            _ => type.ToString()
+        };
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetByTransactionType(TransactionType transactionType)
+    {
+        var categories = await _categoryService
+            .GetByTransactionTypeAsync(transactionType);
+
+        var result = categories.Select(category => new
+        {
+            id = category.Id,
+            name = category.Name
+        });
+
+        return Json(result);
     }
 }

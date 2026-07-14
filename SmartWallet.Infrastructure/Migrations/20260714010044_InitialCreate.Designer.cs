@@ -12,8 +12,8 @@ using SmartWallet.Infrastructure.Data;
 namespace SmartWallet.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260713214820_AddUniqueIndexToCategoryName")]
-    partial class AddUniqueIndexToCategoryName
+    [Migration("20260714010044_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -194,12 +194,12 @@ namespace SmartWallet.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");

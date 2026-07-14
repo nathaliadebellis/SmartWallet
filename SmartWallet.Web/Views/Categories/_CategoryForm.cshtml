@@ -1,4 +1,5 @@
 ﻿@model SmartWallet.Web.ViewModels.Categories.CategoryFormViewModel
+
 <div class="mb-3">
     <label asp-for="Name" class="form-label"></label>
 
@@ -7,6 +8,22 @@
            placeholder="Ex: Alimentação" />
 
     <span asp-validation-for="Name"
+          class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="TransactionType"
+           class="form-label"></label>
+
+    <select asp-for="TransactionType"
+            asp-items="Model.TransactionTypes"
+            class="form-select">
+
+        <option value="">Selecione o tipo...</option>
+
+    </select>
+
+    <span asp-validation-for="TransactionType"
           class="text-danger"></span>
 </div>
 
@@ -33,6 +50,9 @@
                class="form-control"
                placeholder="bi-cart" />
 
+        <span asp-validation-for="Icon"
+              class="text-danger"></span>
+
     </div>
 
     <div class="col-md-6">
@@ -43,6 +63,9 @@
         <input asp-for="Color"
                class="form-control"
                placeholder="#198754" />
+
+        <span asp-validation-for="Color"
+              class="text-danger"></span>
 
     </div>
 

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SmartWallet.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace SmartWallet.Web.ViewModels.Categories;
 
@@ -20,4 +22,11 @@ public class CategoryFormViewModel
 
     [Display(Name = "Cor")]
     public string? Color { get; set; }
+
+    [Required(ErrorMessage = "Selecione o tipo da categoria.")]
+    [Display(Name = "Tipo")]
+    public TransactionType TransactionType { get; set; }
+
+    public IEnumerable<SelectListItem> TransactionTypes { get; set; }
+        = Enumerable.Empty<SelectListItem>();
 }

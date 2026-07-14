@@ -50,6 +50,10 @@ namespace SmartWallet.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -59,116 +63,6 @@ namespace SmartWallet.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Color = "#198754",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Gastos com alimentação",
-                            Icon = "bi-basket2",
-                            Name = "Alimentação"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Color = "#0D6EFD",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Gastos com transporte",
-                            Icon = "bi-car-front",
-                            Name = "Transporte"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Color = "#6F42C1",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Despesas da residência",
-                            Icon = "bi-house",
-                            Name = "Moradia"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Color = "#DC3545",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Despesas com saúde",
-                            Icon = "bi-heart-pulse",
-                            Name = "Saúde"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Color = "#FD7E14",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Cursos e estudos",
-                            Icon = "bi-book",
-                            Name = "Educação"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Color = "#20C997",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Entretenimento e lazer",
-                            Icon = "bi-controller",
-                            Name = "Lazer"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Color = "#198754",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Receitas de salário",
-                            Icon = "bi-cash-stack",
-                            Name = "Salário"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Color = "#FFC107",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Aplicações financeiras",
-                            Icon = "bi-graph-up-arrow",
-                            Name = "Investimentos"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Color = "#6610F2",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Compras de supermercado",
-                            Icon = "bi-cart",
-                            Name = "Mercado"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Color = "#E83E8C",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Despesas com animais",
-                            Icon = "bi-heart",
-                            Name = "Pets"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Color = "#6C757D",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Serviços recorrentes",
-                            Icon = "bi-credit-card",
-                            Name = "Assinaturas"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Color = "#343A40",
-                            CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Outras categorias",
-                            Icon = "bi-three-dots",
-                            Name = "Outros"
-                        });
                 });
 
             modelBuilder.Entity("SmartWallet.Domain.Entities.FinancialTransaction", b =>
@@ -191,12 +85,12 @@ namespace SmartWallet.Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");

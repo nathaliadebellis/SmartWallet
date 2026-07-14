@@ -1,10 +1,8 @@
 ﻿using SmartWallet.Domain.Common;
+using SmartWallet.Domain.Enums;
 
 namespace SmartWallet.Domain.Entities;
 
-/// <summary>
-/// Representa uma categoria utilizada para classificar transações financeiras.
-/// </summary>
 public class Category : BaseEntity
 {
     public const int NameMaxLength = 100;
@@ -20,25 +18,23 @@ public class Category : BaseEntity
 
     public string? Color { get; private set; }
 
-    /// <summary>
-    /// Transações associadas à categoria.
-    /// </summary>
+    public TransactionType TransactionType { get; private set; }
+
     public ICollection<FinancialTransaction> Transactions { get; private set; } = new List<FinancialTransaction>();
 
-    /// <summary>
-    /// Construtor necessário para o Entity Framework Core.
-    /// </summary>
     private Category()
     {
     }
 
     public Category(
         string name,
+        TransactionType transactionType,
         string? description = null,
         string? icon = null,
         string? color = null)
     {
         ChangeName(name);
+        ChangeTransactionType(transactionType);
         ChangeDescription(description);
         ChangeIcon(icon);
         ChangeColor(color);
@@ -46,14 +42,21 @@ public class Category : BaseEntity
 
     public void Update(
         string name,
+        TransactionType transactionType,
         string? description,
         string? icon,
         string? color)
     {
         ChangeName(name);
+        ChangeTransactionType(transactionType);
         ChangeDescription(description);
         ChangeIcon(icon);
         ChangeColor(color);
+    }
+
+    public void ChangeTransactionType(TransactionType transactionType)
+    {
+        TransactionType = transactionType;
     }
 
     public void ChangeName(string name)
