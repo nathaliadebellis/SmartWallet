@@ -10,14 +10,11 @@ namespace SmartWallet.Web.Controllers;
 public class TransactionsController : Controller
 {
     private readonly IFinancialTransactionService _transactionService;
-    private readonly ICategoryService _categoryService;
 
     public TransactionsController(
-        IFinancialTransactionService transactionService,
-        ICategoryService categoryService)
+        IFinancialTransactionService transactionService)
     {
         _transactionService = transactionService;
-        _categoryService = categoryService;
     }
 
     public async Task<IActionResult> Index()
@@ -28,11 +25,11 @@ public class TransactionsController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
         var model = new TransactionFormViewModel();
 
-        await LoadListsAsync(model);
+        LoadLists(model);
 
         return View(model);
     }
@@ -43,7 +40,7 @@ public class TransactionsController : Controller
     {
         if (!ModelState.IsValid)
         {
-            await LoadListsAsync(model);
+            LoadLists(model);
             return View(model);
         }
 
@@ -64,10 +61,84 @@ public class TransactionsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private Task LoadListsAsync(TransactionFormViewModel model)
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id)
     {
-        // As categorias serão carregadas via JavaScript,
-        // de acordo com o tipo selecionado.
+        var transaction = await _transactionService.GetByIdAsync(id);
+
+        if (transaction is null)
+            return NotFound();
+
+        var model = new TransactionFormViewModel
+        {
+            Id = transaction.Id,
+            Description = transaction.Description,
+            Amount = transaction.Amount,
+            TransactionDate = transaction.TransactionDate,
+            Type = transaction.Type,
+            CategoryId = transaction.CategoryId,
+            Notes = transaction.Notes
+        };
+
+        LoadLists(model);
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(TransactionFormViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            LoadLists(model);
+            return View(model);
+        }
+
+        var dto = new UpdateFinancialTransactionDto
+        {
+            Id = model.Id,
+            Description = model.Description,
+            Amount = model.Amount,
+            TransactionDate = model.TransactionDate,
+            Type = model.Type,
+            CategoryId = model.CategoryId,
+            Notes = model.Notes
+        };
+
+        await _transactionService.UpdateAsync(dto);
+
+        TempData["Success"] = "Transação atualizada com sucesso.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var transaction = await _transactionService.GetByIdAsync(id);
+
+        if (transaction is null)
+            return NotFound();
+
+        return View(transaction);
+    }
+
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        await _transactionService.DeleteAsync(id);
+
+        TempData["Success"] = "Transação excluída com sucesso.";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    private static void LoadLists(TransactionFormViewModel model)
+    {
+        // As categorias são carregadas dinamicamente via JavaScript
+        // de acordo com o tipo da transação selecionado.
         model.Categories = Enumerable.Empty<SelectListItem>();
 
         model.TransactionTypes = Enum
@@ -82,7 +153,5 @@ public class TransactionsController : Controller
                     _ => type.ToString()
                 }
             });
-
-        return Task.CompletedTask;
     }
 }
