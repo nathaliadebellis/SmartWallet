@@ -1,27 +1,68 @@
 # 💰 SmartWallet
 
-Sistema web de gerenciamento financeiro pessoal desenvolvido com **ASP.NET Core MVC** e **Entity Framework Core**, utilizando arquitetura em camadas, princípios de Clean Code e boas práticas de desenvolvimento .NET.
+<div align="center">
 
-O SmartWallet tem como objetivo auxiliar no controle de receitas e despesas por meio de uma aplicação organizada, escalável e de fácil manutenção, servindo também como projeto de portfólio para demonstrar conhecimentos em desenvolvimento backend com o ecossistema .NET.
+![.NET](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=.net)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp)
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?style=for-the-badge)
+![Entity Framework Core](https://img.shields.io/badge/EF_Core-68217A?style=for-the-badge)
+![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
+![License](https://img.shields.io/github/license/nathaliadebellis/SmartWallet?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-orange?style=for-the-badge)
+
+</div>
+
+> Organize suas finanças com simplicidade e inteligência.
+
+O **SmartWallet** é um sistema web de gerenciamento financeiro pessoal desenvolvido com **ASP.NET Core MVC** e **Entity Framework Core**, utilizando arquitetura em camadas e boas práticas de desenvolvimento.
+
+Além de auxiliar no controle de receitas e despesas, o projeto foi criado como portfólio para demonstrar conhecimentos em desenvolvimento backend com o ecossistema .NET, aplicando conceitos utilizados em aplicações corporativas.
+
+---
+
+# 🎯 Objetivo
+
+O SmartWallet tem como objetivo oferecer uma plataforma simples, intuitiva e organizada para o gerenciamento financeiro pessoal.
+
+O projeto evolui de forma incremental, seguindo uma abordagem semelhante ao desenvolvimento de software em ambiente corporativo, com implementação contínua de novas funcionalidades, foco em arquitetura, escalabilidade e qualidade de código.
 
 ---
 
 # 🚀 Status do Projeto
 
-🟡 **Em desenvolvimento**
+🚧 **Em desenvolvimento**
 
-**Versão atual:** `v0.2`
+Atualmente o projeto conta com:
+
+- Landing Page responsiva
+- Gerenciamento completo de categorias
+- Cadastro de transações financeiras
+
+As próximas etapas incluem autenticação de usuários, dashboard financeiro, metas, relatórios e testes automatizados.
 
 ---
 
-# ✨ Funcionalidades
+# ✨ Principais Recursos
+
+## 🌐 Landing Page
+
+- ✅ Hero
+- ✅ Dashboard Preview
+- ✅ Seção de Recursos
+- ✅ Como Funciona
+- ✅ Benefícios
+- ✅ Tecnologias
+- ✅ Call To Action
+- ✅ Footer Responsivo
+
+---
 
 ## 📂 Categorias
 
-- ✅ Cadastro de categorias
-- ✅ Listagem de categorias
-- ✅ Edição de categorias
-- ✅ Exclusão de categorias
+- ✅ Cadastro
+- ✅ Listagem
+- ✅ Edição
+- ✅ Exclusão
 - ✅ Validação de categorias duplicadas
 - ✅ Definição de ícone
 - ✅ Definição de cor
@@ -31,22 +72,19 @@ O SmartWallet tem como objetivo auxiliar no controle de receitas e despesas por 
 
 ## 💸 Transações Financeiras
 
-- ✅ Cadastro de transações
+- ✅ Cadastro
 - ✅ Associação com categorias
 - ✅ Validação de dados
 - ✅ Observações opcionais
-- ✅ Carregamento dinâmico das categorias conforme o tipo da transação (Receita/Despesa)
-
-### Em desenvolvimento
-
-- 🚧 Listagem de transações
-- 🚧 Edição de transações
-- 🚧 Exclusão de transações
+- ✅ Carregamento dinâmico das categorias conforme o tipo da transação
 
 ---
 
-## 📈 Próximas funcionalidades
+## 🚧 Em desenvolvimento
 
+- Listagem de transações
+- Edição de transações
+- Exclusão de transações
 - Dashboard financeiro
 - Metas financeiras
 - Relatórios
@@ -59,15 +97,15 @@ O SmartWallet tem como objetivo auxiliar no controle de receitas e despesas por 
 
 # 🏗️ Arquitetura
 
-O SmartWallet foi desenvolvido utilizando uma arquitetura em camadas para promover baixo acoplamento, separação de responsabilidades, reutilização de código e facilidade de manutenção.
+O SmartWallet foi desenvolvido utilizando uma arquitetura em camadas, promovendo separação de responsabilidades, baixo acoplamento, reutilização de código e facilidade de manutenção.
 
 ```text
 SmartWallet
 
 ├── SmartWallet.Web
 │   ├── Controllers
-│   ├── Views
 │   ├── ViewModels
+│   ├── Views
 │   └── wwwroot
 │
 ├── SmartWallet.Application
@@ -133,6 +171,8 @@ SQL Server
 - Razor Views
 - Bootstrap 5
 - Bootstrap Icons
+- HTML5
+- CSS3
 - JavaScript (ES6)
 - Fetch API
 
@@ -140,64 +180,30 @@ SQL Server
 
 # 📐 Boas Práticas Aplicadas
 
+- Arquitetura em camadas
 - Repository Pattern
 - Service Layer
 - Dependency Injection
 - DTO Pattern
 - ViewModels
-- Entity Configurations
 - Fluent API
+- Entity Configurations
 - Entity Framework Migrations
 - Async/Await
-- Validação de domínio
 - Separação de responsabilidades
-- Arquitetura em camadas
+- Clean Code
 
 ---
 
-# 📂 Estrutura do Projeto
+# 📷 Demonstração
 
-```text
-SmartWallet
-
-├── SmartWallet.Domain
-│   ├── Common
-│   ├── Entities
-│   ├── Enums
-│   └── Interfaces
-│
-├── SmartWallet.Application
-│   ├── DTOs
-│   ├── Interfaces
-│   ├── Mappings
-│   └── Services
-│
-├── SmartWallet.Infrastructure
-│   ├── Configurations
-│   ├── Data
-│   ├── Migrations
-│   └── Repositories
-│
-└── SmartWallet.Web
-    ├── Controllers
-    ├── ViewModels
-    ├── Views
-    └── wwwroot
-```
-
----
-
-# 📸 Demonstração
-
-> Em breve serão adicionadas imagens das principais funcionalidades do sistema.
+As imagens e GIFs das principais funcionalidades serão adicionados conforme a evolução do projeto.
 
 ---
 
 # ⚙️ Como Executar o Projeto
 
 ## Pré-requisitos
-
-Certifique-se de possuir instalado:
 
 - .NET SDK 10
 - SQL Server LocalDB
@@ -208,14 +214,14 @@ Certifique-se de possuir instalado:
 ## Clonar o repositório
 
 ```bash
-git clone https://github.com/SEU-USUARIO/SmartWallet.git
+git clone https://github.com/nathaliadebellis/SmartWallet.git
 ```
 
 ---
 
 ## Configurar o banco de dados
 
-Atualize a Connection String em:
+Atualize a *Connection String* em:
 
 ```text
 SmartWallet.Web/appsettings.json
@@ -235,13 +241,13 @@ Exemplo:
 
 ## Criar o banco de dados
 
-No **Package Manager Console**:
+### Package Manager Console
 
 ```powershell
 Update-Database
 ```
 
-Ou utilizando a CLI do .NET:
+### Ou utilizando a CLI
 
 ```bash
 dotnet ef database update --project SmartWallet.Infrastructure --startup-project SmartWallet.Web
@@ -251,13 +257,13 @@ dotnet ef database update --project SmartWallet.Infrastructure --startup-project
 
 ## Executar a aplicação
 
-No Visual Studio:
+### Visual Studio
 
 ```text
 F5
 ```
 
-Ou utilizando a CLI:
+### CLI
 
 ```bash
 dotnet run --project SmartWallet.Web
@@ -265,75 +271,84 @@ dotnet run --project SmartWallet.Web
 
 ---
 
-# 🧪 Testes
-
-Os testes automatizados serão implementados nas próximas versões utilizando:
-
-- xUnit
-- Moq
-
-Objetivos:
-
-- Validar regras de negócio
-- Garantir estabilidade das funcionalidades
-- Facilitar futuras refatorações
-- Melhorar a qualidade do código
-
----
-
 # 📈 Roadmap
 
-## ✅ Versão 0.2
+## 🌐 Landing Page
 
-- [x] Arquitetura em camadas
-- [x] Configuração do Entity Framework Core
-- [x] SQL Server
-- [x] CRUD de Categorias
-- [x] Cadastro de Transações
-- [x] Filtro dinâmico de categorias por tipo de transação
-
----
-
-## 🚧 Versão 0.3
-
-- [ ] Listagem de transações
-- [ ] Edição de transações
-- [ ] Exclusão de transações
-- [ ] Dashboard financeiro
+- [x] Hero
+- [x] Dashboard Preview
+- [x] Seção de Recursos
+- [x] Como Funciona
+- [x] Benefícios
+- [x] Tecnologias
+- [x] Call To Action
+- [x] Footer
+- [x] Responsividade
 
 ---
 
-## 🚧 Versão 0.4
+## 🔐 Autenticação
 
-- [ ] Metas financeiras
-- [ ] Relatórios
-- [ ] Filtros de pesquisa
-- [ ] Ordenação de dados
-
----
-
-## 🚧 Versão 0.5
-
-- [ ] Autenticação de usuários
+- [ ] ASP.NET Core Identity
+- [ ] Login
+- [ ] Cadastro de usuários
+- [ ] Logout
+- [ ] Recuperação de senha
 - [ ] Perfil do usuário
-- [ ] Configurações da aplicação
 
 ---
 
-## 🎯 Versão 1.0
+## 📊 Dashboard
 
-- [ ] Testes automatizados
-- [ ] Deploy em ambiente cloud
-- [ ] Pipeline de CI/CD
-- [ ] Documentação completa
+- [ ] Indicadores financeiros
+- [ ] Resumo de receitas e despesas
+- [ ] Metas financeiras
+- [ ] Gráficos
 
 ---
 
-# 🎯 Objetivo do Projeto
+## 💸 Transações
 
-O SmartWallet foi desenvolvido como projeto de portfólio para consolidar conhecimentos em desenvolvimento web com **ASP.NET Core MVC**, aplicando conceitos utilizados em aplicações corporativas, como arquitetura em camadas, injeção de dependência, persistência de dados, separação de responsabilidades e boas práticas de engenharia de software.
+- [x] Cadastro
+- [ ] Listagem
+- [ ] Edição
+- [ ] Exclusão
+- [ ] Pesquisa
+- [ ] Paginação
 
-Além de servir como ferramenta para gerenciamento financeiro pessoal, o projeto demonstra a aplicação prática de tecnologias e padrões amplamente utilizados no ecossistema .NET.
+---
+
+## 📂 Categorias
+
+- [x] Cadastro
+- [x] Listagem
+- [x] Edição
+- [x] Exclusão
+
+---
+
+## 🎯 Metas Financeiras
+
+- [ ] Cadastro
+- [ ] Acompanhamento
+- [ ] Indicadores
+
+---
+
+## 📄 Relatórios
+
+- [ ] Relatórios financeiros
+- [ ] Exportação para PDF
+- [ ] Exportação para Excel
+
+---
+
+## 🧪 Qualidade
+
+- [ ] Testes unitários
+- [ ] Testes de integração
+- [ ] CI/CD
+- [ ] Deploy
 
 ---
 

@@ -1,0 +1,143 @@
+﻿@{
+    ViewData["Title"] = "SmartWallet";
+}
+
+<footer class="footer">
+
+    <div class="container">
+
+        <div class="row gy-5">
+
+            <!-- Logo -->
+
+            <div class="col-lg-4">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="footer-brand">
+
+                    <i class="bi bi-wallet2"></i>
+
+                    SmartWallet
+
+                </a>
+
+                <p class="footer-description">
+
+                    Sistema web para gerenciamento financeiro pessoal,
+                    desenvolvido com ASP.NET Core MVC, arquitetura em camadas
+                    e boas práticas de desenvolvimento.
+
+                </p>
+
+            </div>
+
+            <!-- Navegação -->
+
+            <div class="col-lg-2 col-6">
+
+                <h5 class="footer-title">
+
+                    Produto
+
+                </h5>
+
+                <ul class="footer-links">
+
+                    <li><a href="#features">Recursos</a></li>
+
+                    <li><a href="#how-it-works">Como funciona</a></li>
+
+                    <li><a href="#benefits">Benefícios</a></li>
+
+                </ul>
+
+            </div>
+
+            <!-- Projeto -->
+
+            <div class="col-lg-3 col-6">
+
+                <h5 class="footer-title">
+
+                    Projeto
+
+                </h5>
+
+                <ul class="footer-links">
+
+                    <li>
+
+                        <a href="https://github.com/nathaliadebellis"
+                           target="_blank">
+
+                            GitHub
+
+                        </a>
+
+                    </li>
+
+                    <li>
+
+                        <a href="https://linkedin.com"
+                           target="_blank">
+
+                            LinkedIn
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <!-- Tecnologias -->
+
+            <div class="col-lg-3">
+
+                <h5 class="footer-title">
+
+                    Tecnologias
+
+                </h5>
+
+                <div class="footer-stack">
+
+                    <span>C#</span>
+
+                    <span>ASP.NET Core</span>
+
+                    <span>EF Core</span>
+
+                    <span>SQL Server</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <hr class="footer-divider">
+
+        <div class="footer-bottom">
+
+            <span>
+
+                © @DateTime.Now.Year SmartWallet.
+
+                Todos os direitos reservados.
+
+            </span>
+
+            <span>
+
+                Desenvolvido por <strong>Nathalia De Bellis Gomes Anselmo</strong>
+
+            </span>
+
+        </div>
+
+    </div>
+
+</footer>
