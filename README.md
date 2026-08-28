@@ -28,20 +28,6 @@ O projeto evolui de forma incremental, seguindo uma abordagem semelhante ao dese
 
 ---
 
-# 🚀 Status do Projeto
-
-🚧 **Em desenvolvimento**
-
-Atualmente o projeto conta com:
-
-- Landing Page responsiva
-- Gerenciamento completo de categorias
-- Cadastro de transações financeiras
-
-As próximas etapas incluem autenticação de usuários, dashboard financeiro, metas, relatórios e testes automatizados.
-
----
-
 # ✨ Principais Recursos
 
 ## 🌐 Landing Page
@@ -82,16 +68,13 @@ As próximas etapas incluem autenticação de usuários, dashboard financeiro, m
 
 ## 🚧 Em desenvolvimento
 
-- Listagem de transações
-- Edição de transações
-- Exclusão de transações
+- Gestão completa de transações
 - Dashboard financeiro
 - Metas financeiras
 - Relatórios
 - Autenticação de usuários
 - Perfil do usuário
 - Exportação de dados
-- Testes automatizados
 
 ---
 
@@ -192,6 +175,11 @@ SQL Server
 - Async/Await
 - Separação de responsabilidades
 - Clean Code
+- Middleware global para tratamento de exceções
+- Domain Exceptions
+- Testes unitários com xUnit
+- Mocking com Moq
+- Assertions fluentes com FluentAssertions
 
 ---
 
@@ -345,10 +333,27 @@ dotnet run --project SmartWallet.Web
 
 ## 🧪 Qualidade
 
-- [ ] Testes unitários
+- [x] Testes unitários
 - [ ] Testes de integração
 - [ ] CI/CD
 - [ ] Deploy
+
+---
+
+# 🧪 Testes
+
+Atualmente o projeto possui:
+
+- Testes de Domínio
+- Testes da Camada Application
+- xUnit
+- FluentAssertions
+- Moq
+
+Status atual:
+
+✅ 32 testes executados
+✅ 32 testes aprovados
 
 ---
 

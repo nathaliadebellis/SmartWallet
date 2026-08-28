@@ -3,6 +3,7 @@ using SmartWallet.Application.Interfaces;
 using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Interfaces;
+using SmartWallet.Domain.Exceptions;
 
 namespace SmartWallet.Application.Services;
 
@@ -44,7 +45,7 @@ public class CategoryService : ICategoryService
     {
         if (await _categoryRepository.ExistsByNameAsync(dto.Name))
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Já existe uma categoria com esse nome.");
         }
 
@@ -63,12 +64,12 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.GetByIdAsync(dto.Id);
 
         if (category is null)
-            throw new KeyNotFoundException(
+            throw new NotFoundException(
                 "Category not found.");
 
         if (await _categoryRepository.ExistsByNameAsync(dto.Name, dto.Id))
         {
-            throw new InvalidOperationException(
+            throw new DomainException(
                 "Já existe uma categoria com esse nome.");
         }
 
@@ -87,7 +88,7 @@ public class CategoryService : ICategoryService
         var category = await _categoryRepository.GetByIdAsync(id);
 
         if (category is null)
-            throw new KeyNotFoundException(
+            throw new NotFoundException(
                 "Category not found.");
 
         await _categoryRepository.DeleteAsync(category);

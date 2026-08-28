@@ -2,6 +2,7 @@
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Application.Mappings;
 using SmartWallet.Domain.Interfaces;
+using SmartWallet.Domain.Exceptions;
 
 namespace SmartWallet.Application.Services;
 
@@ -48,7 +49,7 @@ public class FinancialTransactionService : IFinancialTransactionService
         var transaction = await _repository.GetByIdAsync(dto.Id);
 
         if (transaction is null)
-            throw new KeyNotFoundException(
+            throw new NotFoundException(
                 "Transaction not found.");
 
         transaction.UpdateEntity(dto);
@@ -62,7 +63,7 @@ public class FinancialTransactionService : IFinancialTransactionService
         var transaction = await _repository.GetByIdAsync(id);
 
         if (transaction is null)
-            throw new KeyNotFoundException(
+            throw new NotFoundException(
                 "Transaction not found.");
 
         await _repository.DeleteAsync(transaction);

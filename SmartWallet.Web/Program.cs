@@ -4,6 +4,7 @@ using SmartWallet.Application.Interfaces;
 using SmartWallet.Application.Services;
 using SmartWallet.Domain.Interfaces;
 using SmartWallet.Infrastructure.Repositories;
+using SmartWallet.Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Global exception handling middleware that maps domain exceptions to proper HTTP status codes
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseRouting();
 
