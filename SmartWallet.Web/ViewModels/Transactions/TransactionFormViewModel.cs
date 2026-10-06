@@ -36,11 +36,9 @@ public class TransactionFormViewModel
     [Display(Name = "Observações")]
     public string? Notes { get; set; }
 
-    // Lista de categorias para o DropDown
     public IEnumerable<SelectListItem> Categories { get; set; }
         = Enumerable.Empty<SelectListItem>();
 
-    // Lista dos tipos (Receita / Despesa)
     public IEnumerable<SelectListItem> TransactionTypes { get; set; }
         = Enumerable.Empty<SelectListItem>();
 }

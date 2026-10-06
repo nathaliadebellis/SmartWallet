@@ -38,11 +38,9 @@ public class FinancialTransactionTests
     [InlineData("   ")]
     public void Create_WithInvalidDescription_ShouldThrow(string? invalid)
     {
-        // Act
         Action act = () => new FinancialTransaction(invalid ?? string.Empty, 10m, DateTime.UtcNow, TransactionType.Expense, 1);
 
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage("Description is required.*");
+        act.Should().Throw<ArgumentException>().WithMessage("Descrição é obrigatória.*");
     }
 
     [Theory]
@@ -50,24 +48,19 @@ public class FinancialTransactionTests
     [InlineData(-10)]
     public void Create_WithNonPositiveAmount_ShouldThrow(decimal invalidAmount)
     {
-        // Act
         Action act = () => new FinancialTransaction("Desc", invalidAmount, DateTime.UtcNow, TransactionType.Expense, 1);
 
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage("Amount must be greater than zero.*");
+        act.Should().Throw<ArgumentException>().WithMessage("O valor deve ser maior que zero.*");
     }
 
     [Fact]
     public void Update_WithValidData_ShouldUpdatePropertiesAndSetUpdatedAt()
     {
-        // Arrange
         var tx = new FinancialTransaction("Old", 10m, DateTime.UtcNow, TransactionType.Expense, 1);
         var newDate = DateTime.UtcNow.AddDays(1);
 
-        // Act
         tx.Update("New Description", 20m, newDate, TransactionType.Income, 2, "notes");
 
-        // Assert
         tx.Description.Should().Be("New Description");
         tx.Amount.Should().Be(20m);
         tx.TransactionDate.Should().Be(newDate);
@@ -80,13 +73,10 @@ public class FinancialTransactionTests
     [Fact]
     public void Update_WithInvalidData_ShouldThrow()
     {
-        // Arrange
         var tx = new FinancialTransaction("Old", 10m, DateTime.UtcNow, TransactionType.Expense, 1);
 
-        // Act
         Action act = () => tx.Update("", 0m, DateTime.UtcNow, TransactionType.Expense, 1, null);
 
-        // Assert
         act.Should().Throw<ArgumentException>();
     }
 }

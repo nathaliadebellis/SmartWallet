@@ -11,18 +11,15 @@ public class CategoryTests
     [Fact]
     public void Create_WithValidData_ShouldSetProperties()
     {
-        // Arrange
         var name = "  Food  ";
         var transactionType = TransactionType.Expense;
         var description = "Groceries and dining";
         var icon = "fa-utensils";
         var color = "#ff0000";
 
-        // Act
         var category = new Category(name, transactionType, description, icon, color);
 
-        // Assert
-        category.Name.Should().Be("Food"); // trimmed
+        category.Name.Should().Be("Food"); // nome deve ser trimado
         category.TransactionType.Should().Be(transactionType);
         category.Description.Should().Be(description);
         category.Icon.Should().Be(icon);
@@ -35,52 +32,40 @@ public class CategoryTests
     [InlineData("   ")]
     public void Create_WithInvalidName_ShouldThrow(string? invalidName)
     {
-        // Arrange
 
-        // Act
         Action act = () => new Category(invalidName ?? string.Empty, TransactionType.Expense);
 
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage("Category name is required.*");
+        act.Should().Throw<ArgumentException>().WithMessage("Nome da categoria é obrigatório.*");
     }
 
     [Fact]
     public void Create_WithTooLongName_ShouldThrow()
     {
-        // Arrange
         var longName = new string('a', Category.NameMaxLength + 1);
 
-        // Act
         Action act = () => new Category(longName, TransactionType.Income);
 
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"Category name cannot exceed {Category.NameMaxLength} characters.*");
+        act.Should().Throw<ArgumentException>().WithMessage($"O nome da categoria não pode exceder {Category.NameMaxLength} caracteres.*");
     }
 
     [Fact]
     public void ChangeDescription_WithTooLongDescription_ShouldThrow()
     {
-        // Arrange
         var category = new Category("Test", TransactionType.Income);
         var longDescription = new string('d', Category.DescriptionMaxLength + 1);
 
-        // Act
         Action act = () => category.ChangeDescription(longDescription);
 
-        // Assert
-        act.Should().Throw<ArgumentException>().WithMessage($"Description cannot exceed {Category.DescriptionMaxLength} characters.*");
+        act.Should().Throw<ArgumentException>().WithMessage($"A descrição não pode exceder {Category.DescriptionMaxLength} caracteres.*");
     }
 
     [Fact]
     public void Update_ShouldChangeProperties()
     {
-        // Arrange
         var category = new Category("Old", TransactionType.Expense);
 
-        // Act
         category.Update("New Name", TransactionType.Income, "desc", "icon", "color");
 
-        // Assert
         category.Name.Should().Be("New Name");
         category.TransactionType.Should().Be(TransactionType.Income);
         category.Description.Should().Be("desc");

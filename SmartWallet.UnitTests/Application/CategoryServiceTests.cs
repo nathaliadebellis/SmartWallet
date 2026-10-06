@@ -29,7 +29,8 @@ public class CategoryServiceTests
         repoMock.Setup(r => r.GetAllAsync())
             .ReturnsAsync(categories);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         var result = await service.GetAllAsync();
@@ -49,7 +50,8 @@ public class CategoryServiceTests
 
         repoMock.Setup(r => r.ExistsByNameAsync(dto.Name)).ReturnsAsync(true);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.CreateAsync(dto);
@@ -68,7 +70,8 @@ public class CategoryServiceTests
 
         repoMock.Setup(r => r.ExistsByNameAsync(dto.Name)).ReturnsAsync(false);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         await service.CreateAsync(dto);
@@ -86,7 +89,8 @@ public class CategoryServiceTests
 
         repoMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync((Category?)null);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.UpdateAsync(dto);
@@ -107,7 +111,8 @@ public class CategoryServiceTests
         repoMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync(existing);
         repoMock.Setup(r => r.ExistsByNameAsync(dto.Name, dto.Id)).ReturnsAsync(true);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.UpdateAsync(dto);
@@ -128,7 +133,8 @@ public class CategoryServiceTests
         repoMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync(existing);
         repoMock.Setup(r => r.ExistsByNameAsync(dto.Name, dto.Id)).ReturnsAsync(false);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         await service.UpdateAsync(dto);
@@ -144,7 +150,8 @@ public class CategoryServiceTests
         var repoMock = new Mock<ICategoryRepository>();
         repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Category?)null);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.DeleteAsync(1);
@@ -162,7 +169,8 @@ public class CategoryServiceTests
         var existing = new Category("Test", TransactionType.Expense);
         repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existing);
 
-        var service = new CategoryService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new CategoryService(repoMock.Object, uowMock.Object);
 
         // Act
         await service.DeleteAsync(1);

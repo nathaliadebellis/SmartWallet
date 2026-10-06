@@ -31,7 +31,8 @@ public class FinancialTransactionServiceTests
 
         repoMock.Setup(r => r.GetAllAsync()).ReturnsAsync(transactions);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
         var result = await service.GetAllAsync();
@@ -52,10 +53,11 @@ public class FinancialTransactionServiceTests
 
         repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(tx);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
-        var result = await service.GetByIdAsync(1);
+        var result = await service.GetByIdAsync(1, "test-user");
 
         // Assert
         result.Should().NotBeNull();
@@ -78,10 +80,11 @@ public class FinancialTransactionServiceTests
             Notes = "n"
         };
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
-        await service.CreateAsync(dto);
+        await service.CreateAsync(dto, "test-user-id");
 
         // Assert
         repoMock.Verify(r => r.AddAsync(It.Is<FinancialTransaction>(t => t.Description == dto.Description && t.Amount == dto.Amount && t.CategoryId == dto.CategoryId && t.Notes == dto.Notes)), Times.Once);
@@ -96,7 +99,8 @@ public class FinancialTransactionServiceTests
 
         repoMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync((FinancialTransaction?)null);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.UpdateAsync(dto);
@@ -116,7 +120,8 @@ public class FinancialTransactionServiceTests
 
         repoMock.Setup(r => r.GetByIdAsync(dto.Id)).ReturnsAsync(existing);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
         await service.UpdateAsync(dto);
@@ -132,7 +137,8 @@ public class FinancialTransactionServiceTests
         var repoMock = new Mock<IFinancialTransactionRepository>();
         repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((FinancialTransaction?)null);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
         var act = async () => await service.DeleteAsync(1);
@@ -150,7 +156,8 @@ public class FinancialTransactionServiceTests
         var existing = new FinancialTransaction("T", 1m, System.DateTime.UtcNow, TransactionType.Expense, 1);
         repoMock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existing);
 
-        var service = new FinancialTransactionService(repoMock.Object);
+        var uowMock = new Mock<SmartWallet.Application.Interfaces.IUnitOfWork>();
+        var service = new FinancialTransactionService(repoMock.Object, uowMock.Object);
 
         // Act
         await service.DeleteAsync(1);

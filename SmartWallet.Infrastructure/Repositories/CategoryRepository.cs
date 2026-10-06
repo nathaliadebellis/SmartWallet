@@ -42,7 +42,6 @@ public class CategoryRepository : ICategoryRepository
     public async Task AddAsync(Category category)
     {
         await _context.Categories.AddAsync(category);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<bool> ExistsByNameAsync(string name)
@@ -62,12 +61,10 @@ public class CategoryRepository : ICategoryRepository
     public async Task UpdateAsync(Category category)
     {
         _context.Categories.Update(category);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Category category)
     {
         _context.Categories.Remove(category);
-        await _context.SaveChangesAsync();
     }
 }

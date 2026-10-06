@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartWallet.Domain.Entities;
+using SmartWallet.Infrastructure.Identity;
 
 namespace SmartWallet.Infrastructure.Configurations;
 
@@ -35,6 +36,14 @@ public class FinancialTransactionConfiguration
         builder.HasOne(transaction => transaction.Category)
             .WithMany(category => category.Transactions)
             .HasForeignKey(transaction => transaction.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property<string>("ApplicationUserId")
+            .HasColumnType("nvarchar(450)");
+
+        builder.HasOne(typeof(ApplicationUser))
+            .WithMany()
+            .HasForeignKey("ApplicationUserId")
             .OnDelete(DeleteBehavior.Restrict);
 
         #endregion

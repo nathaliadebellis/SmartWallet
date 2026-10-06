@@ -8,10 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SmartWallet.Domain\SmartWallet.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Identity\" />
+    <ProjectReference Include="..\SmartWallet.Application\SmartWallet.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +18,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

@@ -9,11 +9,14 @@ namespace SmartWallet.Application.Services;
 public class FinancialTransactionService : IFinancialTransactionService
 {
     private readonly IFinancialTransactionRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public FinancialTransactionService(
-        IFinancialTransactionRepository repository)
+        IFinancialTransactionRepository repository,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
 
@@ -26,20 +29,30 @@ public class FinancialTransactionService : IFinancialTransactionService
     }
 
 
-    public async Task<FinancialTransactionDto?> GetByIdAsync(int id)
+    public async Task<FinancialTransactionDto?> GetByIdAsync(int id, string userId)
     {
         var transaction = await _repository.GetByIdAsync(id);
 
-        return transaction?.ToDto();
+        if (transaction is null)
+            return null;
+
+        if (transaction.ApplicationUserId != userId)
+            return null;
+
+        return transaction.ToDto();
     }
 
 
     public async Task CreateAsync(
-        CreateFinancialTransactionDto dto)
+        CreateFinancialTransactionDto dto,
+        string userId)
     {
         var transaction = dto.ToEntity();
 
+        transaction.ApplicationUserId = userId;
+
         await _repository.AddAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
     }
 
 
@@ -50,11 +63,12 @@ public class FinancialTransactionService : IFinancialTransactionService
 
         if (transaction is null)
             throw new NotFoundException(
-                "Transaction not found.");
+                "Transação não encontrada.");
 
         transaction.UpdateEntity(dto);
 
         await _repository.UpdateAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
     }
 
 
@@ -64,8 +78,9 @@ public class FinancialTransactionService : IFinancialTransactionService
 
         if (transaction is null)
             throw new NotFoundException(
-                "Transaction not found.");
+                "Transação não encontrada.");
 
         await _repository.DeleteAsync(transaction);
+        await _unitOfWork.SaveChangesAsync();
     }
 }

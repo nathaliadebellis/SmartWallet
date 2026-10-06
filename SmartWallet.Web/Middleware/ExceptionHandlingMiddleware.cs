@@ -22,11 +22,17 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
+            try
+            {
+                _logger.LogInformation("Incoming request {Method} {Path} - Authenticated={IsAuthenticated}", context.Request.Method, context.Request.Path, context.User?.Identity?.IsAuthenticated ?? false);
+            }
+            catch { }
+
             await _next(context);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception caught by middleware");
+            _logger.LogError(ex, "Exceção não tratada capturada pelo middleware");
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -39,6 +45,7 @@ public class ExceptionHandlingMiddleware
             statusCode = StatusCodes.Status404NotFound;
         else if (exception is DomainException)
             statusCode = StatusCodes.Status400BadRequest;
+
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;

@@ -6,9 +6,9 @@ public interface IFinancialTransactionService
 {
     Task<IEnumerable<FinancialTransactionDto>> GetAllAsync();
 
-    Task<FinancialTransactionDto?> GetByIdAsync(int id);
+    Task<FinancialTransactionDto?> GetByIdAsync(int id, string userId);
 
-    Task CreateAsync(CreateFinancialTransactionDto dto);
+    Task CreateAsync(CreateFinancialTransactionDto dto, string userId);
 
     Task UpdateAsync(UpdateFinancialTransactionDto dto);
 

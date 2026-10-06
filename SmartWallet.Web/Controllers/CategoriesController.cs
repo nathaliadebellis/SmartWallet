@@ -7,6 +7,9 @@ using SmartWallet.Web.ViewModels.Categories;
 
 namespace SmartWallet.Web.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 public class CategoriesController : Controller
 {
     private readonly ICategoryService _categoryService;

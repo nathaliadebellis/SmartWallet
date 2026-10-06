@@ -1,0 +1,91 @@
+@model SmartWallet.Web.ViewModels.Dashboard.DashboardViewModel
+@using System.Globalization
+@{
+    Layout = "_DashboardLayout";
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Dashboard</h1>
+            <p class="lead">Bem-vindo ao SmartWallet, @Model.NomeUsuario!</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo Atual</h5>
+                    <p class="card-text display-6">@Model.SaldoAtual.ToString("C", CultureInfo.CurrentCulture)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Receitas</h5>
+                    <p class="card-text display-6 text-success">@Model.TotalReceitas.ToString("C", CultureInfo.CurrentCulture)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Despesas</h5>
+                    <p class="card-text display-6 text-danger">@Model.TotalDespesas.ToString("C", CultureInfo.CurrentCulture)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4>Últimas transações</h4>
+            @if (Model.UltimasTransacoes != null && Model.UltimasTransacoes.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th class="text-end">Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.UltimasTransacoes)
+                            {
+                                <tr>
+                                    <td>@t.TransactionDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@t.Description</td>
+                                    <td>@t.CategoryName</td>
+                                    <td class="text-end">@t.Amount.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Nenhuma transação encontrada.</p>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h4>Gráfico de despesas por categoria</h4>
+            <p class="text-muted">Em breve: gráfico de despesas por categoria.</p>
+        </div>
+        <div class="col-md-6">
+            <h4>Resumo financeiro mensal</h4>
+            <p class="text-muted">Em breve: resumo financeiro mensal.</p>
+        </div>
+    </div>
+</div>

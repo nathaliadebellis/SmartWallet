@@ -68,13 +68,13 @@ O projeto evolui de forma incremental, seguindo uma abordagem semelhante ao dese
 
 ## 🚧 Em desenvolvimento
 
+- Dashboard com dados reais
 - Gestão completa de transações
-- Dashboard financeiro
 - Metas financeiras
-- Relatórios
-- Autenticação de usuários
+- Relatórios financeiros
 - Perfil do usuário
 - Exportação de dados
+- Multiusuário com isolamento de dados
 
 ---
 
@@ -85,29 +85,33 @@ O SmartWallet foi desenvolvido utilizando uma arquitetura em camadas, promovendo
 ```text
 SmartWallet
 
-├── SmartWallet.Web
-│   ├── Controllers
-│   ├── ViewModels
-│   ├── Views
-│   └── wwwroot
-│
+
 ├── SmartWallet.Application
 │   ├── DTOs
+│   ├── Exceptions
 │   ├── Interfaces
 │   ├── Mappings
 │   └── Services
-│
+│   
 ├── SmartWallet.Domain
 │   ├── Common
 │   ├── Entities
 │   ├── Enums
+│   ├── Exceptions
 │   └── Interfaces
+│ 
+├── SmartWallet.Infrastructure
+│   ├── Configurations
+│   ├── Data
+│   ├── Identity
+│   ├── Migrations
+│   └── Repositories
 │
-└── SmartWallet.Infrastructure
-    ├── Configurations
-    ├── Data
-    ├── Migrations
-    └── Repositories
+└── SmartWallet.Web
+    ├── Controllers
+    ├── ViewModels
+    ├── Views
+    └── wwwroot
 ```
 
 ---
@@ -159,6 +163,12 @@ SQL Server
 - JavaScript (ES6)
 - Fetch API
 
+## Segurança e Autenticação
+
+- ASP.NET Core Identity
+- Authentication Cookies
+- Authorization Policies
+
 ---
 
 # 📐 Boas Práticas Aplicadas
@@ -180,12 +190,6 @@ SQL Server
 - Testes unitários com xUnit
 - Mocking com Moq
 - Assertions fluentes com FluentAssertions
-
----
-
-# 📷 Demonstração
-
-As imagens e GIFs das principais funcionalidades serão adicionados conforme a evolução do projeto.
 
 ---
 
@@ -277,10 +281,10 @@ dotnet run --project SmartWallet.Web
 
 ## 🔐 Autenticação
 
-- [ ] ASP.NET Core Identity
-- [ ] Login
-- [ ] Cadastro de usuários
-- [ ] Logout
+- [x] ASP.NET Core Identity
+- [x] Login
+- [x] Cadastro de usuários
+- [x] Logout
 - [ ] Recuperação de senha
 - [ ] Perfil do usuário
 
@@ -288,8 +292,11 @@ dotnet run --project SmartWallet.Web
 
 ## 📊 Dashboard
 
-- [ ] Indicadores financeiros
-- [ ] Resumo de receitas e despesas
+- [x] Dashboard autenticado
+- [x] Boas-vindas ao usuário logado
+- [x] Cards financeiros
+- [ ] Indicadores financeiros reais
+- [ ] Últimas transações
 - [ ] Metas financeiras
 - [ ] Gráficos
 

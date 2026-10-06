@@ -22,6 +22,8 @@ public class FinancialTransaction : BaseEntity
 
     public Category Category { get; private set; } = null!;
 
+    public string ApplicationUserId { get; set; } = string.Empty;
+
     private FinancialTransaction()
     {
     }
@@ -67,10 +69,10 @@ public class FinancialTransaction : BaseEntity
     private void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Description is required.");
+            throw new ArgumentException("Descrição é obrigatória.");
 
         if (description.Length > DescriptionMaxLength)
-            throw new ArgumentException($"Description cannot exceed {DescriptionMaxLength} characters.");
+            throw new ArgumentException($"A descrição não pode exceder {DescriptionMaxLength} caracteres.");
 
         Description = description.Trim();
     }
@@ -78,7 +80,7 @@ public class FinancialTransaction : BaseEntity
     private void SetAmount(decimal amount)
     {
         if (amount <= 0)
-            throw new ArgumentException("Amount must be greater than zero.");
+            throw new ArgumentException("O valor deve ser maior que zero.");
 
         Amount = amount;
     }

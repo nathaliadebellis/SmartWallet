@@ -10,10 +10,14 @@ namespace SmartWallet.Application.Services;
 public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CategoryService(ICategoryRepository categoryRepository)
+    public CategoryService(
+        ICategoryRepository categoryRepository,
+        IUnitOfWork unitOfWork)
     {
         _categoryRepository = categoryRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<CategoryDto>> GetAllAsync()
@@ -57,6 +61,7 @@ public class CategoryService : ICategoryService
             dto.Color);
 
         await _categoryRepository.AddAsync(category);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(UpdateCategoryDto dto)
@@ -65,7 +70,7 @@ public class CategoryService : ICategoryService
 
         if (category is null)
             throw new NotFoundException(
-                "Category not found.");
+                "Categoria não encontrada.");
 
         if (await _categoryRepository.ExistsByNameAsync(dto.Name, dto.Id))
         {
@@ -81,6 +86,7 @@ public class CategoryService : ICategoryService
             dto.Color);
 
         await _categoryRepository.UpdateAsync(category);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -89,9 +95,10 @@ public class CategoryService : ICategoryService
 
         if (category is null)
             throw new NotFoundException(
-                "Category not found.");
+                "Categoria não encontrada.");
 
         await _categoryRepository.DeleteAsync(category);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     private static CategoryDto MapToDto(Category category)

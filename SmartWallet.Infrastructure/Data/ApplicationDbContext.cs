@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartWallet.Domain.Entities;
+using SmartWallet.Infrastructure.Identity;
 
 namespace SmartWallet.Infrastructure.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)

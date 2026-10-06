@@ -62,11 +62,11 @@ public class Category : BaseEntity
     public void ChangeName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Category name is required.");
+            throw new ArgumentException("Nome da categoria é obrigatório.");
 
         if (name.Length > NameMaxLength)
             throw new ArgumentException(
-                $"Category name cannot exceed {NameMaxLength} characters.");
+                $"O nome da categoria não pode exceder {NameMaxLength} caracteres.");
 
         Name = name.Trim();
     }
@@ -77,7 +77,7 @@ public class Category : BaseEntity
             description.Length > DescriptionMaxLength)
         {
             throw new ArgumentException(
-                $"Description cannot exceed {DescriptionMaxLength} characters.");
+                $"A descrição não pode exceder {DescriptionMaxLength} caracteres.");
         }
 
         Description = string.IsNullOrWhiteSpace(description)
@@ -91,7 +91,7 @@ public class Category : BaseEntity
             icon.Length > IconMaxLength)
         {
             throw new ArgumentException(
-                $"Icon cannot exceed {IconMaxLength} characters.");
+                $"O ícone não pode exceder {IconMaxLength} caracteres.");
         }
 
         Icon = string.IsNullOrWhiteSpace(icon)
@@ -105,7 +105,7 @@ public class Category : BaseEntity
             color.Length > ColorMaxLength)
         {
             throw new ArgumentException(
-                $"Color cannot exceed {ColorMaxLength} characters.");
+                $"A cor não pode exceder {ColorMaxLength} caracteres.");
         }
 
         Color = string.IsNullOrWhiteSpace(color)

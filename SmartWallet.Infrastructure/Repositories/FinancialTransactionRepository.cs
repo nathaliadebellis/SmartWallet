@@ -30,21 +30,46 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 
+    public async Task<IEnumerable<FinancialTransaction>> GetByUserAsync(string userId)
+    {
+        return await _context.FinancialTransactions
+            .Where(t => t.ApplicationUserId == userId)
+            .Include(t => t.Category)
+            .AsNoTracking()
+            .OrderByDescending(t => t.TransactionDate)
+            .ToListAsync();
+    }
+
+    public async Task<decimal> GetTotalByUserAndTypeAsync(string userId, Domain.Enums.TransactionType type)
+    {
+        return await _context.FinancialTransactions
+            .Where(t => t.ApplicationUserId == userId && t.Type == type)
+            .SumAsync(t => (decimal?)t.Amount) ?? 0m;
+    }
+
+    public async Task<IEnumerable<FinancialTransaction>> GetLatestByUserAsync(string userId, int count)
+    {
+        return await _context.FinancialTransactions
+            .Where(t => t.ApplicationUserId == userId)
+            .Include(t => t.Category)
+            .AsNoTracking()
+            .OrderByDescending(t => t.TransactionDate)
+            .Take(count)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(FinancialTransaction transaction)
     {
         await _context.FinancialTransactions.AddAsync(transaction);
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(FinancialTransaction transaction)
     {
         _context.FinancialTransactions.Update(transaction);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(FinancialTransaction transaction)
     {
         _context.FinancialTransactions.Remove(transaction);
-        await _context.SaveChangesAsync();
     }
 }

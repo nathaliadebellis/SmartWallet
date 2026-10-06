@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartWallet.Application.DTOs.FinancialTransactions;
 using SmartWallet.Application.Interfaces;
@@ -7,6 +8,9 @@ using SmartWallet.Web.ViewModels.Transactions;
 
 namespace SmartWallet.Web.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 public class TransactionsController : Controller
 {
     private readonly IFinancialTransactionService _transactionService;
@@ -54,7 +58,9 @@ public class TransactionsController : Controller
             Notes = model.Notes
         };
 
-        await _transactionService.CreateAsync(dto);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        await _transactionService.CreateAsync(dto, userId);
 
         TempData["Success"] = "Transação cadastrada com sucesso.";
 
@@ -64,7 +70,9 @@ public class TransactionsController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var transaction = await _transactionService.GetByIdAsync(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        var transaction = await _transactionService.GetByIdAsync(id, userId);
 
         if (transaction is null)
             return NotFound();
@@ -95,6 +103,12 @@ public class TransactionsController : Controller
             return View(model);
         }
 
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        var existing = await _transactionService.GetByIdAsync(model.Id, userId);
+        if (existing is null)
+            return NotFound();
+
         var dto = new UpdateFinancialTransactionDto
         {
             Id = model.Id,
@@ -116,7 +130,9 @@ public class TransactionsController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        var transaction = await _transactionService.GetByIdAsync(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        var transaction = await _transactionService.GetByIdAsync(id, userId);
 
         if (transaction is null)
             return NotFound();
@@ -128,6 +144,12 @@ public class TransactionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+        var existing = await _transactionService.GetByIdAsync(id, userId);
+        if (existing is null)
+            return NotFound();
+
         await _transactionService.DeleteAsync(id);
 
         TempData["Success"] = "Transação excluída com sucesso.";
@@ -137,8 +159,6 @@ public class TransactionsController : Controller
 
     private static void LoadLists(TransactionFormViewModel model)
     {
-        // As categorias são carregadas dinamicamente via JavaScript
-        // de acordo com o tipo da transação selecionado.
         model.Categories = Enumerable.Empty<SelectListItem>();
 
         model.TransactionTypes = Enum

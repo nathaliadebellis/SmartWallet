@@ -91,59 +91,28 @@
                                asp-controller="Home"
                                asp-action="Index">
 
-                                Home
+                                Início
 
                             </a>
 
                         </li>
 
-                        <li class="nav-item">
-
-                            <a class="nav-link"
-                               asp-controller="Dashboard"
-                               asp-action="Index">
-
-                                Dashboard
-
-                            </a>
-
-                        </li>
-
-                        <li class="nav-item">
-
-                            <a class="nav-link"
-                               asp-controller="Transactions"
-                               asp-action="Index">
-
-                                Transações
-
-                            </a>
-
-                        </li>
-
-                        <li class="nav-item">
-
-                            <a class="nav-link"
-                               asp-controller="Categories"
-                               asp-action="Index">
-
-                                Categorias
-
-                            </a>
-
-                        </li>
-
-                        <li class="nav-item ms-lg-3">
-
-                            <a class="btn btn-primary px-4"
-                               asp-controller="Transactions"
-                               asp-action="Create">
-
-                                Nova Transação
-
-                            </a>
-
-                        </li>
+                        @if (!(User?.Identity?.IsAuthenticated ?? false))
+                        {
+                            <li class="nav-item ms-lg-3">
+                                <a class="btn btn-outline-primary me-2" asp-controller="Account" asp-action="Login">Entrar</a>
+                                <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Cadastrar</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item ms-lg-3">
+                                <a class="nav-link" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                            </li>
+                            <li class="nav-item ms-lg-3">
+                                <a href="#" class="btn btn-outline-secondary" onclick="submitLogout(); return false;">Sair</a>
+                            </li>
+                        }
 
                     </ul>
 
@@ -171,6 +140,16 @@
             asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    @* Logout form submitted via JavaScript to perform POST with antiforgery token *@
+    <form id="logoutForm" method="post" asp-controller="Account" asp-action="Logout" class="d-none"> 
+        @Html.AntiForgeryToken()
+    </form>
+    <script>
+        function submitLogout() {
+            document.getElementById('logoutForm').submit();
+        }
+    </script>
 
 </body>
 
