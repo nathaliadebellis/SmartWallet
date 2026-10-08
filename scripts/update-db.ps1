@@ -1,6 +1,6 @@
-
-dotnet ef migrations add InitialIdentity -p SmartWallet.Infrastructure -s SmartWallet.Web --context ApplicationDbContext
-
+# Applies existing migrations (creates the database if it does not exist).
+# To create a new migration: dotnet ef migrations add <Name> -p SmartWallet.Infrastructure -s SmartWallet.Web
+dotnet tool restore
 dotnet ef database update -p SmartWallet.Infrastructure -s SmartWallet.Web --context ApplicationDbContext
 
-Write-Host "Migrations added and database updated (if migrations were created)."
+Write-Host "Database update completed."

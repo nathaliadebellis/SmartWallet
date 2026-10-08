@@ -64,7 +64,12 @@
                                     <td>@t.TransactionDate.ToString("dd/MM/yyyy")</td>
                                     <td>@t.Description</td>
                                     <td>@t.CategoryName</td>
-                                    <td class="text-end">@t.Amount.ToString("C", System.Globalization.CultureInfo.CurrentCulture)</td>
+                                    @{
+                                        var isIncome = t.Type == "Income";
+                                    }
+                                    <td class="text-end fw-semibold @(isIncome ? "text-success" : "text-danger")">
+                                        @(isIncome ? "+" : "-") @t.Amount.ToString("C", CultureInfo.CurrentCulture)
+                                    </td>
                                 </tr>
                             }
                         </tbody>

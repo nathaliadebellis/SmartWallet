@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartWallet.Application.DTOs.Categories;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Domain.Enums;
+using SmartWallet.Domain.Exceptions;
+using SmartWallet.Web.Extensions;
 using SmartWallet.Web.ViewModels.Categories;
 
 namespace SmartWallet.Web.Controllers;
@@ -21,7 +23,7 @@ public class CategoriesController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var categories = await _categoryService.GetAllAsync();
+        var categories = await _categoryService.GetAllAsync(User.GetUserId());
 
         return View(categories);
     }
@@ -55,7 +57,16 @@ public class CategoriesController : Controller
             TransactionType = model.TransactionType
         };
 
-        await _categoryService.CreateAsync(dto);
+        try
+        {
+            await _categoryService.CreateAsync(dto, User.GetUserId());
+        }
+        catch (DomainException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            LoadTransactionTypes(model);
+            return View(model);
+        }
 
         TempData["Success"] = "Categoria criada com sucesso.";
 
@@ -65,7 +76,7 @@ public class CategoriesController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var category = await _categoryService.GetByIdAsync(id);
+        var category = await _categoryService.GetByIdAsync(id, User.GetUserId());
 
         if (category is null)
             return NotFound();
@@ -105,7 +116,20 @@ public class CategoriesController : Controller
             TransactionType = model.TransactionType
         };
 
-        await _categoryService.UpdateAsync(dto);
+        try
+        {
+            await _categoryService.UpdateAsync(dto, User.GetUserId());
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (DomainException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            LoadTransactionTypes(model);
+            return View(model);
+        }
 
         TempData["Success"] = "Categoria atualizada com sucesso.";
 
@@ -115,7 +139,7 @@ public class CategoriesController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        var category = await _categoryService.GetByIdAsync(id);
+        var category = await _categoryService.GetByIdAsync(id, User.GetUserId());
 
         if (category is null)
             return NotFound();
@@ -127,7 +151,19 @@ public class CategoriesController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        await _categoryService.DeleteAsync(id);
+        try
+        {
+            await _categoryService.DeleteAsync(id, User.GetUserId());
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (DomainException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index));
+        }
 
         TempData["Success"] = "Categoria removida com sucesso.";
 
@@ -159,7 +195,7 @@ public class CategoriesController : Controller
     public async Task<IActionResult> GetByTransactionType(TransactionType transactionType)
     {
         var categories = await _categoryService
-            .GetByTransactionTypeAsync(transactionType);
+            .GetByTransactionTypeAsync(transactionType, User.GetUserId());
 
         var result = categories.Select(category => new
         {

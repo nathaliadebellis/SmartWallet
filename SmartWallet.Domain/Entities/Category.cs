@@ -20,6 +20,8 @@ public class Category : BaseEntity
 
     public TransactionType TransactionType { get; private set; }
 
+    public string ApplicationUserId { get; set; } = string.Empty;
+
     public ICollection<FinancialTransaction> Transactions { get; private set; } = new List<FinancialTransaction>();
 
     private Category()

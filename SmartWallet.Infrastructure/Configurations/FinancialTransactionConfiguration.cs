@@ -38,13 +38,16 @@ public class FinancialTransactionConfiguration
             .HasForeignKey(transaction => transaction.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property<string>("ApplicationUserId")
-            .HasColumnType("nvarchar(450)");
+        builder.Property(transaction => transaction.ApplicationUserId)
+            .IsRequired()
+            .HasMaxLength(450);
 
-        builder.HasOne(typeof(ApplicationUser))
+        builder.HasOne<ApplicationUser>()
             .WithMany()
-            .HasForeignKey("ApplicationUserId")
+            .HasForeignKey(transaction => transaction.ApplicationUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(transaction => new { transaction.ApplicationUserId, transaction.TransactionDate });
 
         #endregion
     }
