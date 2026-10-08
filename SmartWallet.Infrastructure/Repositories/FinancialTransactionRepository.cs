@@ -14,15 +14,6 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<FinancialTransaction>> GetAllAsync()
-    {
-        return await _context.FinancialTransactions
-            .Include(t => t.Category)
-            .AsNoTracking()
-            .OrderByDescending(t => t.TransactionDate)
-            .ToListAsync();
-    }
-
     public async Task<FinancialTransaction?> GetByIdAsync(int id)
     {
         return await _context.FinancialTransactions
@@ -37,6 +28,7 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
             .Include(t => t.Category)
             .AsNoTracking()
             .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.Id)
             .ToListAsync();
     }
 
@@ -54,6 +46,7 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
             .Include(t => t.Category)
             .AsNoTracking()
             .OrderByDescending(t => t.TransactionDate)
+            .ThenByDescending(t => t.Id)
             .Take(count)
             .ToListAsync();
     }
@@ -63,13 +56,17 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
         await _context.FinancialTransactions.AddAsync(transaction);
     }
 
-    public async Task UpdateAsync(FinancialTransaction transaction)
+    public Task UpdateAsync(FinancialTransaction transaction)
     {
         _context.FinancialTransactions.Update(transaction);
+
+        return Task.CompletedTask;
     }
 
-    public async Task DeleteAsync(FinancialTransaction transaction)
+    public Task DeleteAsync(FinancialTransaction transaction)
     {
         _context.FinancialTransactions.Remove(transaction);
+
+        return Task.CompletedTask;
     }
 }

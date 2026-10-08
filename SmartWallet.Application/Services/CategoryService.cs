@@ -1,4 +1,4 @@
-﻿using SmartWallet.Application.DTOs.Categories;
+using SmartWallet.Application.DTOs.Categories;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Enums;
@@ -9,6 +9,18 @@ namespace SmartWallet.Application.Services;
 
 public class CategoryService : ICategoryService
 {
+    private static readonly (string Name, TransactionType Type)[] DefaultCategories =
+    {
+        ("Salário", TransactionType.Income),
+        ("Outras receitas", TransactionType.Income),
+        ("Alimentação", TransactionType.Expense),
+        ("Moradia", TransactionType.Expense),
+        ("Transporte", TransactionType.Expense),
+        ("Saúde", TransactionType.Expense),
+        ("Lazer", TransactionType.Expense),
+        ("Outras despesas", TransactionType.Expense)
+    };
+
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -20,34 +32,35 @@ public class CategoryService : ICategoryService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<IEnumerable<CategoryDto>> GetAllAsync()
+    public async Task<IEnumerable<CategoryDto>> GetAllAsync(string userId)
     {
-        var categories = await _categoryRepository.GetAllAsync();
+        var categories = await _categoryRepository.GetAllAsync(userId);
 
         return categories.Select(MapToDto);
     }
 
     public async Task<IEnumerable<CategoryDto>> GetByTransactionTypeAsync(
-        TransactionType transactionType)
+        TransactionType transactionType,
+        string userId)
     {
         var categories = await _categoryRepository
-            .GetByTransactionTypeAsync(transactionType);
+            .GetByTransactionTypeAsync(transactionType, userId);
 
         return categories.Select(MapToDto);
     }
 
-    public async Task<CategoryDto?> GetByIdAsync(int id)
+    public async Task<CategoryDto?> GetByIdAsync(int id, string userId)
     {
-        var category = await _categoryRepository.GetByIdAsync(id);
+        var category = await _categoryRepository.GetByIdAsync(id, userId);
 
         return category is null
             ? null
             : MapToDto(category);
     }
 
-    public async Task CreateAsync(CreateCategoryDto dto)
+    public async Task CreateAsync(CreateCategoryDto dto, string userId)
     {
-        if (await _categoryRepository.ExistsByNameAsync(dto.Name))
+        if (await _categoryRepository.ExistsByNameAsync(dto.Name, userId))
         {
             throw new DomainException(
                 "Já existe uma categoria com esse nome.");
@@ -58,21 +71,33 @@ public class CategoryService : ICategoryService
             dto.TransactionType,
             dto.Description,
             dto.Icon,
-            dto.Color);
+            dto.Color)
+        {
+            ApplicationUserId = userId
+        };
 
         await _categoryRepository.AddAsync(category);
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(UpdateCategoryDto dto)
+    public async Task CreateDefaultCategoriesAsync(string userId)
     {
-        var category = await _categoryRepository.GetByIdAsync(dto.Id);
+        var categories = DefaultCategories.Select(c =>
+            new Category(c.Name, c.Type) { ApplicationUserId = userId });
+
+        await _categoryRepository.AddRangeAsync(categories);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(UpdateCategoryDto dto, string userId)
+    {
+        var category = await _categoryRepository.GetByIdAsync(dto.Id, userId);
 
         if (category is null)
             throw new NotFoundException(
                 "Categoria não encontrada.");
 
-        if (await _categoryRepository.ExistsByNameAsync(dto.Name, dto.Id))
+        if (await _categoryRepository.ExistsByNameAsync(dto.Name, userId, dto.Id))
         {
             throw new DomainException(
                 "Já existe uma categoria com esse nome.");
@@ -89,13 +114,19 @@ public class CategoryService : ICategoryService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, string userId)
     {
-        var category = await _categoryRepository.GetByIdAsync(id);
+        var category = await _categoryRepository.GetByIdAsync(id, userId);
 
         if (category is null)
             throw new NotFoundException(
                 "Categoria não encontrada.");
+
+        if (await _categoryRepository.HasTransactionsAsync(id, userId))
+        {
+            throw new DomainException(
+                "Não é possível excluir uma categoria que possui transações.");
+        }
 
         await _categoryRepository.DeleteAsync(category);
         await _unitOfWork.SaveChangesAsync();

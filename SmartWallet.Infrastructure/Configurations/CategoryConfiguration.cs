@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SmartWallet.Domain.Entities;
+using SmartWallet.Infrastructure.Identity;
 
 namespace SmartWallet.Infrastructure.Configurations;
 
@@ -16,7 +17,16 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasMaxLength(Category.NameMaxLength);
 
-        builder.HasIndex(c => c.Name)
+        builder.Property(c => c.ApplicationUserId)
+            .IsRequired()
+            .HasMaxLength(450);
+
+        builder.HasOne<ApplicationUser>()
+            .WithMany()
+            .HasForeignKey(c => c.ApplicationUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex(c => new { c.ApplicationUserId, c.Name })
             .IsUnique();
 
         builder.Property(c => c.Description)

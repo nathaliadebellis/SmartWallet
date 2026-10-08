@@ -1,22 +1,27 @@
-﻿using SmartWallet.Domain.Entities;
+using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Enums;
 
 namespace SmartWallet.Domain.Interfaces;
 
 public interface ICategoryRepository
 {
-    Task<IEnumerable<Category>> GetAllAsync();
+    Task<IEnumerable<Category>> GetAllAsync(string userId);
 
     Task<IEnumerable<Category>> GetByTransactionTypeAsync(
-        TransactionType transactionType);
+        TransactionType transactionType,
+        string userId);
 
-    Task<Category?> GetByIdAsync(int id);
+    Task<Category?> GetByIdAsync(int id, string userId);
 
-    Task<bool> ExistsByNameAsync(string name);
+    Task<bool> ExistsByNameAsync(string name, string userId);
 
-    Task<bool> ExistsByNameAsync(string name, int ignoreId);
+    Task<bool> ExistsByNameAsync(string name, string userId, int ignoreId);
+
+    Task<bool> HasTransactionsAsync(int categoryId, string userId);
 
     Task AddAsync(Category category);
+
+    Task AddRangeAsync(IEnumerable<Category> categories);
 
     Task UpdateAsync(Category category);
 

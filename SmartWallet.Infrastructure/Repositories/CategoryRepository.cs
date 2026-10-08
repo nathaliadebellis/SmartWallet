@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Interfaces;
@@ -15,28 +15,31 @@ public class CategoryRepository : ICategoryRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Category>> GetAllAsync()
+    public async Task<IEnumerable<Category>> GetAllAsync(string userId)
     {
         return await _context.Categories
             .AsNoTracking()
+            .Where(c => c.ApplicationUserId == userId)
             .OrderBy(c => c.Name)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Category>> GetByTransactionTypeAsync(
-        TransactionType transactionType)
+        TransactionType transactionType,
+        string userId)
     {
         return await _context.Categories
             .AsNoTracking()
-            .Where(c => c.TransactionType == transactionType)
+            .Where(c => c.ApplicationUserId == userId &&
+                        c.TransactionType == transactionType)
             .OrderBy(c => c.Name)
             .ToListAsync();
     }
 
-    public async Task<Category?> GetByIdAsync(int id)
+    public async Task<Category?> GetByIdAsync(int id, string userId)
     {
         return await _context.Categories
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.Id == id && c.ApplicationUserId == userId);
     }
 
     public async Task AddAsync(Category category)
@@ -44,27 +47,47 @@ public class CategoryRepository : ICategoryRepository
         await _context.Categories.AddAsync(category);
     }
 
-    public async Task<bool> ExistsByNameAsync(string name)
+    public async Task AddRangeAsync(IEnumerable<Category> categories)
     {
-        return await _context.Categories
-            .AnyAsync(category => category.Name == name);
+        await _context.Categories.AddRangeAsync(categories);
     }
 
-    public async Task<bool> ExistsByNameAsync(string name, int ignoreId)
+    public async Task<bool> ExistsByNameAsync(string name, string userId)
     {
         return await _context.Categories
             .AnyAsync(category =>
+                category.ApplicationUserId == userId &&
+                category.Name == name);
+    }
+
+    public async Task<bool> ExistsByNameAsync(string name, string userId, int ignoreId)
+    {
+        return await _context.Categories
+            .AnyAsync(category =>
+                category.ApplicationUserId == userId &&
                 category.Name == name &&
                 category.Id != ignoreId);
     }
 
-    public async Task UpdateAsync(Category category)
+    public async Task<bool> HasTransactionsAsync(int categoryId, string userId)
     {
-        _context.Categories.Update(category);
+        return await _context.FinancialTransactions
+            .AnyAsync(t =>
+                t.CategoryId == categoryId &&
+                t.ApplicationUserId == userId);
     }
 
-    public async Task DeleteAsync(Category category)
+    public Task UpdateAsync(Category category)
+    {
+        _context.Categories.Update(category);
+
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(Category category)
     {
         _context.Categories.Remove(category);
+
+        return Task.CompletedTask;
     }
 }

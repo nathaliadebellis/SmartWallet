@@ -1,11 +1,9 @@
-﻿using SmartWallet.Domain.Entities;
+using SmartWallet.Domain.Entities;
 
 namespace SmartWallet.Domain.Interfaces;
 
 public interface IFinancialTransactionRepository
 {
-    Task<IEnumerable<FinancialTransaction>> GetAllAsync();
-
     Task<FinancialTransaction?> GetByIdAsync(int id);
 
     Task<IEnumerable<FinancialTransaction>> GetByUserAsync(string userId);

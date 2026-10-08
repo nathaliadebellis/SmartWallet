@@ -4,6 +4,7 @@ using System.Diagnostics;
 
 namespace SmartWallet.Web.Controllers
 {
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     public class HomeController : Controller
     {
         public IActionResult Index()

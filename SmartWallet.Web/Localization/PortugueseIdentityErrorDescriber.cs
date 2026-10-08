@@ -12,9 +12,9 @@ public class PortugueseIdentityErrorDescriber : IdentityErrorDescriber
     public override IdentityError PasswordRequiresUpper() => new() { Code = nameof(PasswordRequiresUpper), Description = "A senha deve conter pelo menos uma letra maiúscula (A-Z)." };
     public override IdentityError PasswordRequiresLower() => new() { Code = nameof(PasswordRequiresLower), Description = "A senha deve conter pelo menos uma letra minúscula (a-z)." };
     public override IdentityError PasswordRequiresUniqueChars(int uniqueChars) => new() { Code = nameof(PasswordRequiresUniqueChars), Description = $"A senha deve conter pelo menos {uniqueChars} caracteres únicos." };
-    public override IdentityError InvalidUserName(string userName) => new() { Code = nameof(InvalidUserName), Description = "Nome de usuário inválido." };
+    public override IdentityError InvalidUserName(string? userName) => new() { Code = nameof(InvalidUserName), Description = "Nome de usuário inválido." };
     public override IdentityError DuplicateUserName(string userName) => new() { Code = nameof(DuplicateUserName), Description = "Nome de usuário já está em uso." };
-    public override IdentityError InvalidEmail(string email) => new() { Code = nameof(InvalidEmail), Description = "E-mail inválido." };
+    public override IdentityError InvalidEmail(string? email) => new() { Code = nameof(InvalidEmail), Description = "E-mail inválido." };
     public override IdentityError DuplicateEmail(string email) => new() { Code = nameof(DuplicateEmail), Description = "E-mail já está em uso." };
     public override IdentityError PasswordMismatch() => new() { Code = nameof(PasswordMismatch), Description = "Senha incorreta." };
     public override IdentityError InvalidToken() => new() { Code = nameof(InvalidToken), Description = "Token inválido." };

@@ -1,6 +1,7 @@
-﻿using SmartWallet.Application.DTOs.FinancialTransactions;
+using SmartWallet.Application.DTOs.FinancialTransactions;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Application.Mappings;
+using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Interfaces;
 using SmartWallet.Domain.Exceptions;
 
@@ -9,20 +10,23 @@ namespace SmartWallet.Application.Services;
 public class FinancialTransactionService : IFinancialTransactionService
 {
     private readonly IFinancialTransactionRepository _repository;
+    private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public FinancialTransactionService(
         IFinancialTransactionRepository repository,
+        ICategoryRepository categoryRepository,
         IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
     }
 
 
-    public async Task<IEnumerable<FinancialTransactionDto>> GetAllAsync()
+    public async Task<IEnumerable<FinancialTransactionDto>> GetAllAsync(string userId)
     {
-        var transactions = await _repository.GetAllAsync();
+        var transactions = await _repository.GetByUserAsync(userId);
 
         return transactions.Select(transaction =>
             transaction.ToDto());
@@ -47,6 +51,8 @@ public class FinancialTransactionService : IFinancialTransactionService
         CreateFinancialTransactionDto dto,
         string userId)
     {
+        await EnsureCategoryIsValidAsync(dto.CategoryId, dto.Type, userId);
+
         var transaction = dto.ToEntity();
 
         transaction.ApplicationUserId = userId;
@@ -57,13 +63,16 @@ public class FinancialTransactionService : IFinancialTransactionService
 
 
     public async Task UpdateAsync(
-        UpdateFinancialTransactionDto dto)
+        UpdateFinancialTransactionDto dto,
+        string userId)
     {
         var transaction = await _repository.GetByIdAsync(dto.Id);
 
-        if (transaction is null)
+        if (transaction is null || transaction.ApplicationUserId != userId)
             throw new NotFoundException(
                 "Transação não encontrada.");
+
+        await EnsureCategoryIsValidAsync(dto.CategoryId, dto.Type, userId);
 
         transaction.UpdateEntity(dto);
 
@@ -72,15 +81,31 @@ public class FinancialTransactionService : IFinancialTransactionService
     }
 
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, string userId)
     {
         var transaction = await _repository.GetByIdAsync(id);
 
-        if (transaction is null)
+        if (transaction is null || transaction.ApplicationUserId != userId)
             throw new NotFoundException(
                 "Transação não encontrada.");
 
         await _repository.DeleteAsync(transaction);
         await _unitOfWork.SaveChangesAsync();
+    }
+
+
+    private async Task EnsureCategoryIsValidAsync(
+        int categoryId,
+        TransactionType type,
+        string userId)
+    {
+        var category = await _categoryRepository.GetByIdAsync(categoryId, userId);
+
+        if (category is null)
+            throw new DomainException("Categoria inválida.");
+
+        if (category.TransactionType != type)
+            throw new DomainException(
+                "A categoria selecionada não corresponde ao tipo da transação.");
     }
 }

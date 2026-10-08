@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using SmartWallet.Web.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartWallet.Application.DTOs.FinancialTransactions;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Domain.Enums;
+using SmartWallet.Domain.Exceptions;
 using SmartWallet.Web.ViewModels.Transactions;
 
 namespace SmartWallet.Web.Controllers;
@@ -23,7 +24,7 @@ public class TransactionsController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var transactions = await _transactionService.GetAllAsync();
+        var transactions = await _transactionService.GetAllAsync(User.GetUserId());
 
         return View(transactions);
     }
@@ -58,9 +59,18 @@ public class TransactionsController : Controller
             Notes = model.Notes
         };
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
-        await _transactionService.CreateAsync(dto, userId);
+        try
+        {
+            await _transactionService.CreateAsync(dto, userId);
+        }
+        catch (DomainException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            LoadLists(model);
+            return View(model);
+        }
 
         TempData["Success"] = "Transação cadastrada com sucesso.";
 
@@ -70,7 +80,7 @@ public class TransactionsController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
         var transaction = await _transactionService.GetByIdAsync(id, userId);
 
@@ -103,7 +113,7 @@ public class TransactionsController : Controller
             return View(model);
         }
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
         var existing = await _transactionService.GetByIdAsync(model.Id, userId);
         if (existing is null)
@@ -120,7 +130,16 @@ public class TransactionsController : Controller
             Notes = model.Notes
         };
 
-        await _transactionService.UpdateAsync(dto);
+        try
+        {
+            await _transactionService.UpdateAsync(dto, userId);
+        }
+        catch (DomainException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            LoadLists(model);
+            return View(model);
+        }
 
         TempData["Success"] = "Transação atualizada com sucesso.";
 
@@ -130,7 +149,7 @@ public class TransactionsController : Controller
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
         var transaction = await _transactionService.GetByIdAsync(id, userId);
 
@@ -144,13 +163,13 @@ public class TransactionsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
         var existing = await _transactionService.GetByIdAsync(id, userId);
         if (existing is null)
             return NotFound();
 
-        await _transactionService.DeleteAsync(id);
+        await _transactionService.DeleteAsync(id, userId);
 
         TempData["Success"] = "Transação excluída com sucesso.";
 

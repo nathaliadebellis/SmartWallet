@@ -1,12 +1,12 @@
-using System;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using SmartWallet.Domain.Exceptions;
 
 namespace SmartWallet.Web.Middleware;
 
+/// <summary>
+/// Translates domain exceptions into 400/404 responses. Any other exception is
+/// rethrown so the framework error page handles it without leaking details.
+/// </summary>
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -22,40 +22,19 @@ public class ExceptionHandlingMiddleware
     {
         try
         {
-            try
-            {
-                _logger.LogInformation("Incoming request {Method} {Path} - Authenticated={IsAuthenticated}", context.Request.Method, context.Request.Path, context.User?.Identity?.IsAuthenticated ?? false);
-            }
-            catch { }
-
             await _next(context);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is NotFoundException or DomainException && !context.Response.HasStarted)
         {
-            _logger.LogError(ex, "Exceção não tratada capturada pelo middleware");
-            await HandleExceptionAsync(context, ex);
+            _logger.LogWarning(ex, "Exceção de domínio capturada pelo middleware");
+
+            context.Response.Clear();
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = ex is NotFoundException
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(new { message = ex.Message }));
         }
-    }
-
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-    {
-        int statusCode = StatusCodes.Status500InternalServerError;
-
-        if (exception is NotFoundException)
-            statusCode = StatusCodes.Status404NotFound;
-        else if (exception is DomainException)
-            statusCode = StatusCodes.Status400BadRequest;
-
-
-        context.Response.ContentType = "application/json";
-        context.Response.StatusCode = statusCode;
-
-        var payload = JsonSerializer.Serialize(new
-        {
-            error = exception.GetType().Name,
-            message = exception.Message
-        });
-
-        return context.Response.WriteAsync(payload ?? string.Empty);
     }
 }

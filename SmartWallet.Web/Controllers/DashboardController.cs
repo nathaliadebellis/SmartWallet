@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SmartWallet.Web.ViewModels.Dashboard;
 using SmartWallet.Application.Interfaces;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
-
-using SmartWallet.Application.DTOs.Dashboard;
+using SmartWallet.Infrastructure.Identity;
+using SmartWallet.Web.Extensions;
+using SmartWallet.Web.ViewModels.Dashboard;
 
 namespace SmartWallet.Web.Controllers;
 
@@ -13,37 +12,29 @@ namespace SmartWallet.Web.Controllers;
 public class DashboardController : Controller
 {
     private readonly IDashboardService _dashboardService;
-    private readonly ILogger<DashboardController> _logger;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public DashboardController(IDashboardService dashboardService, ILogger<DashboardController> logger)
+    public DashboardController(
+        IDashboardService dashboardService,
+        UserManager<ApplicationUser> userManager)
     {
         _dashboardService = dashboardService;
-        _logger = logger;
+        _userManager = userManager;
     }
 
     public async Task<IActionResult> Index()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+        var userId = User.GetUserId();
 
-        _logger.LogInformation("Carregando Dashboard para usuário {UserId}", userId);
-
-        DashboardDto dto;
-        try
-        {
-            dto = await _dashboardService.GetDashboardAsync(userId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Erro ao carregar dados do Dashboard para usuário {UserId}", userId);
-            throw;
-        }
+        var dto = await _dashboardService.GetDashboardAsync(userId);
+        var user = await _userManager.GetUserAsync(User);
 
         var model = new DashboardViewModel
         {
             TotalReceitas = dto.TotalReceitas,
             TotalDespesas = dto.TotalDespesas,
             SaldoAtual = dto.SaldoAtual,
-            NomeUsuario = User?.Identity?.Name ?? string.Empty,
+            NomeUsuario = user?.FullName ?? user?.Email ?? User.Identity?.Name,
             UltimasTransacoes = dto.UltimasTransacoes.Select(t => new RecentTransactionViewModel
             {
                 Id = t.Id,
@@ -58,4 +49,3 @@ public class DashboardController : Controller
         return View(model);
     }
 }
-

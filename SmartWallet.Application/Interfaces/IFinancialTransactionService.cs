@@ -1,16 +1,16 @@
-﻿using SmartWallet.Application.DTOs.FinancialTransactions;
+using SmartWallet.Application.DTOs.FinancialTransactions;
 
 namespace SmartWallet.Application.Interfaces;
 
 public interface IFinancialTransactionService
 {
-    Task<IEnumerable<FinancialTransactionDto>> GetAllAsync();
+    Task<IEnumerable<FinancialTransactionDto>> GetAllAsync(string userId);
 
     Task<FinancialTransactionDto?> GetByIdAsync(int id, string userId);
 
     Task CreateAsync(CreateFinancialTransactionDto dto, string userId);
 
-    Task UpdateAsync(UpdateFinancialTransactionDto dto);
+    Task UpdateAsync(UpdateFinancialTransactionDto dto, string userId);
 
-    Task DeleteAsync(int id);
+    Task DeleteAsync(int id, string userId);
 }
