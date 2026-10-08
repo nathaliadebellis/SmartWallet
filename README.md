@@ -285,8 +285,8 @@ dotnet run --project SmartWallet.Web
 - [x] Login
 - [x] Cadastro de usuários
 - [x] Logout
-- [ ] Recuperação de senha
-- [ ] Perfil do usuário
+- [x] Recuperação de senha
+- [x] Perfil do usuário
 
 ---
 
@@ -305,11 +305,11 @@ dotnet run --project SmartWallet.Web
 ## 💸 Transações
 
 - [x] Cadastro
-- [ ] Listagem
-- [ ] Edição
-- [ ] Exclusão
-- [ ] Pesquisa
-- [ ] Paginação
+- [x] Listagem
+- [x] Edição
+- [x] Exclusão
+- [x] Pesquisa
+- [x] Paginação
 
 ---
 
@@ -359,8 +359,8 @@ Atualmente o projeto possui:
 
 Status atual:
 
-✅ 32 testes executados
-✅ 32 testes aprovados
+✅ 42 testes executados
+✅ 42 testes aprovados
 
 ---
 
