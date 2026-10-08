@@ -1,7 +1,9 @@
+using SmartWallet.Application.DTOs;
 using SmartWallet.Application.DTOs.FinancialTransactions;
 using SmartWallet.Application.Interfaces;
 using SmartWallet.Application.Mappings;
 using SmartWallet.Domain.Enums;
+using SmartWallet.Domain.Filters;
 using SmartWallet.Domain.Interfaces;
 using SmartWallet.Domain.Exceptions;
 
@@ -9,6 +11,8 @@ namespace SmartWallet.Application.Services;
 
 public class FinancialTransactionService : IFinancialTransactionService
 {
+    public const int MaxPageSize = 100;
+
     private readonly IFinancialTransactionRepository _repository;
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -30,6 +34,58 @@ public class FinancialTransactionService : IFinancialTransactionService
 
         return transactions.Select(transaction =>
             transaction.ToDto());
+    }
+
+
+    public async Task<PagedResultDto<FinancialTransactionDto>> SearchAsync(
+        TransactionFilterDto filter,
+        string userId)
+    {
+        var pageSize = Math.Clamp(filter.PageSize, 1, MaxPageSize);
+        var from = filter.From;
+        var to = filter.To;
+
+        if (from.HasValue && to.HasValue && from > to)
+            (from, to) = (to, from);
+
+        var domainFilter = new TransactionFilter
+        {
+            Search = filter.Search,
+            Type = filter.Type,
+            CategoryId = filter.CategoryId,
+            From = from,
+            To = to,
+            Page = Math.Max(filter.Page, 1),
+            PageSize = pageSize
+        };
+
+        var result = await _repository.SearchByUserAsync(userId, domainFilter);
+
+        // Página fora do intervalo (ex.: após excluir o último item da última página).
+        if (result.Items.Count == 0 && result.TotalCount > 0 && result.TotalPages > 0)
+        {
+            domainFilter = new TransactionFilter
+            {
+                Search = domainFilter.Search,
+                Type = domainFilter.Type,
+                CategoryId = domainFilter.CategoryId,
+                From = domainFilter.From,
+                To = domainFilter.To,
+                Page = result.TotalPages,
+                PageSize = pageSize
+            };
+
+            result = await _repository.SearchByUserAsync(userId, domainFilter);
+        }
+
+        return new PagedResultDto<FinancialTransactionDto>
+        {
+            Items = result.Items.Select(t => t.ToDto()).ToList(),
+            Page = result.Page,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages
+        };
     }
 
 

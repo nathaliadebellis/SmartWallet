@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SmartWallet.Web.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SmartWallet.Application.DTOs.FinancialTransactions;
@@ -15,18 +16,62 @@ using Microsoft.AspNetCore.Authorization;
 public class TransactionsController : Controller
 {
     private readonly IFinancialTransactionService _transactionService;
+    private readonly ICategoryService _categoryService;
 
     public TransactionsController(
-        IFinancialTransactionService transactionService)
+        IFinancialTransactionService transactionService,
+        ICategoryService categoryService)
     {
         _transactionService = transactionService;
+        _categoryService = categoryService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(TransactionFilterViewModel filter)
     {
-        var transactions = await _transactionService.GetAllAsync(User.GetUserId());
+        var userId = User.GetUserId();
 
-        return View(transactions);
+        if (!TransactionFilterViewModel.PageSizeOptions.Contains(filter.PageSize))
+            filter.PageSize = TransactionFilterViewModel.PageSizeOptions[1];
+
+        var result = await _transactionService.SearchAsync(new TransactionFilterDto
+        {
+            Search = filter.Search,
+            Type = filter.Type,
+            CategoryId = filter.CategoryId,
+            From = filter.From,
+            To = filter.To,
+            Page = filter.Page,
+            PageSize = filter.PageSize
+        }, userId);
+
+        var categories = await _categoryService.GetAllAsync(userId);
+
+        var model = new TransactionListViewModel
+        {
+            Filter = filter,
+            Page = result.Page,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages,
+            Items = result.Items.Select(t => new TransactionListItemViewModel
+            {
+                Id = t.Id,
+                Type = t.Type,
+                Description = t.Description,
+                CategoryName = t.CategoryName,
+                Amount = t.Amount,
+                TransactionDate = t.TransactionDate
+            }).ToList(),
+            Categories = categories.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name,
+                Selected = c.Id == filter.CategoryId
+            }),
+            TransactionTypes = GetTransactionTypeItems()
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -169,7 +214,19 @@ public class TransactionsController : Controller
         if (existing is null)
             return NotFound();
 
-        await _transactionService.DeleteAsync(id, userId);
+        try
+        {
+            await _transactionService.DeleteAsync(id, userId);
+        }
+        catch (NotFoundException)
+        {
+            return NotFound();
+        }
+        catch (DbUpdateException)
+        {
+            TempData["Error"] = "Não foi possível excluir a transação. Tente novamente.";
+            return RedirectToAction(nameof(Index));
+        }
 
         TempData["Success"] = "Transação excluída com sucesso.";
 
@@ -180,7 +237,12 @@ public class TransactionsController : Controller
     {
         model.Categories = Enumerable.Empty<SelectListItem>();
 
-        model.TransactionTypes = Enum
+        model.TransactionTypes = GetTransactionTypeItems();
+    }
+
+    private static IEnumerable<SelectListItem> GetTransactionTypeItems()
+    {
+        return Enum
             .GetValues<TransactionType>()
             .Select(type => new SelectListItem
             {
@@ -191,6 +253,7 @@ public class TransactionsController : Controller
                     TransactionType.Expense => "Despesa",
                     _ => type.ToString()
                 }
-            });
+            })
+            .ToList();
     }
 }

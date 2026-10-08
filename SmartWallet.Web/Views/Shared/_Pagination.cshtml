@@ -1,0 +1,57 @@
+@model SmartWallet.Web.ViewModels.Transactions.TransactionListViewModel
+
+@{
+    Dictionary<string, string?> RouteFor(int page) => new()
+    {
+        ["Search"] = Model.Filter.Search,
+        ["Type"] = Model.Filter.Type?.ToString(),
+        ["CategoryId"] = Model.Filter.CategoryId?.ToString(),
+        ["From"] = Model.Filter.From?.ToString("yyyy-MM-dd"),
+        ["To"] = Model.Filter.To?.ToString("yyyy-MM-dd"),
+        ["PageSize"] = Model.PageSize.ToString(),
+        ["Page"] = page.ToString()
+    };
+
+    var start = Math.Max(1, Model.Page - 2);
+    var end = Math.Min(Model.TotalPages, Model.Page + 2);
+}
+
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="Paginação das transações">
+        <ul class="pagination pagination-sm mb-0 justify-content-center">
+            <li class="page-item @(Model.Page <= 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-all-route-data="RouteFor(Model.Page - 1)">Anterior</a>
+            </li>
+
+            @if (start > 1)
+            {
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="RouteFor(1)">1</a></li>
+                @if (start > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+            }
+
+            @for (var i = start; i <= end; i++)
+            {
+                <li class="page-item @(i == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="RouteFor(i)">@i</a>
+                </li>
+            }
+
+            @if (end < Model.TotalPages)
+            {
+                @if (end < Model.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="RouteFor(Model.TotalPages)">@Model.TotalPages</a></li>
+            }
+
+            <li class="page-item @(Model.Page >= Model.TotalPages ? "disabled" : "")">
+                <a class="page-link" asp-action="Index" asp-all-route-data="RouteFor(Model.Page + 1)">Próxima</a>
+            </li>
+        </ul>
+    </nav>
+}

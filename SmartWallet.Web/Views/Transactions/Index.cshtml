@@ -1,9 +1,13 @@
-﻿@model IEnumerable<SmartWallet.Application.DTOs.FinancialTransactions.FinancialTransactionDto>
+@model SmartWallet.Web.ViewModels.Transactions.TransactionListViewModel
 
 @using SmartWallet.Domain.Enums
+@using SmartWallet.Web.ViewModels.Transactions
 
 @{
     ViewData["Title"] = "Transações";
+
+    var firstItem = Model.TotalCount == 0 ? 0 : ((Model.Page - 1) * Model.PageSize) + 1;
+    var lastItem = Math.Min(Model.Page * Model.PageSize, Model.TotalCount);
 }
 
 <div class="container">
@@ -15,22 +19,88 @@
             Transações
         </h1>
 
-        <a asp-action="Create"
-           class="btn btn-primary">
-
+        <a asp-action="Create" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i>
             Nova Transação
-
         </a>
 
     </div>
 
-    @if (!Model.Any())
+    <form asp-action="Index" method="get" class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-4">
+                    <label asp-for="Filter.Search" class="form-label"></label>
+                    <input asp-for="Filter.Search"
+                           class="form-control"
+                           maxlength="150"
+                           placeholder="Descrição ou categoria" />
+                </div>
+
+                <div class="col-sm-6 col-lg-2">
+                    <label asp-for="Filter.Type" class="form-label"></label>
+                    <select asp-for="Filter.Type"
+                            asp-items="Model.TransactionTypes"
+                            class="form-select">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <label asp-for="Filter.CategoryId" class="form-label"></label>
+                    <select asp-for="Filter.CategoryId"
+                            asp-items="Model.Categories"
+                            class="form-select">
+                        <option value="">Todas</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <label asp-for="Filter.From" class="form-label"></label>
+                    <input asp-for="Filter.From" type="date" class="form-control" />
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <label asp-for="Filter.To" class="form-label"></label>
+                    <input asp-for="Filter.To" type="date" class="form-control" />
+                </div>
+
+                <div class="col-sm-6 col-lg-2">
+                    <label asp-for="Filter.PageSize" class="form-label"></label>
+                    <select asp-for="Filter.PageSize" class="form-select">
+                        @foreach (var size in TransactionFilterViewModel.PageSizeOptions)
+                        {
+                            <option value="@size" selected="@(size == Model.PageSize)">@size</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                        Filtrar
+                    </button>
+
+                    @if (Model.HasActiveFilters)
+                    {
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i>
+                            Limpar
+                        </a>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    @if (!Model.Items.Any())
     {
         <div class="alert alert-info">
-
-            Nenhuma transação cadastrada.
-
+            @(Model.HasActiveFilters
+                ? "Nenhuma transação encontrada para os filtros informados."
+                : "Nenhuma transação cadastrada.")
         </div>
     }
     else
@@ -42,74 +112,45 @@
                 <table class="table table-hover align-middle mb-0">
 
                     <thead class="table-light">
-
                         <tr>
-
-                            <th>Data</th>
-
-                            <th>Descrição</th>
-
-                            <th>Categoria</th>
-
                             <th>Tipo</th>
-
+                            <th>Descrição</th>
+                            <th>Categoria</th>
                             <th class="text-end">Valor</th>
-
+                            <th>Data</th>
                             <th class="text-center">Ações</th>
-
                         </tr>
-
                     </thead>
 
                     <tbody>
 
-                        @foreach (var transaction in Model)
+                        @foreach (var transaction in Model.Items)
                         {
+                            var isIncome = transaction.Type == TransactionType.Income;
+
                             <tr>
-
                                 <td>
-                                    @transaction.TransactionDate.ToString("dd/MM/yyyy")
+                                    <span class="badge @(isIncome ? "bg-success" : "bg-danger")">
+                                        @(isIncome ? "Receita" : "Despesa")
+                                    </span>
                                 </td>
 
-                                <td>
-                                    @transaction.Description
-                                </td>
+                                <td>@transaction.Description</td>
 
-                                <td>
-                                    @transaction.CategoryName
-                                </td>
+                                <td>@transaction.CategoryName</td>
 
-                                <td>
-
-                                    @if (transaction.Type == TransactionType.Income)
-                                    {
-                                        <span class="badge bg-success">
-                                            Receita
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">
-                                            Despesa
-                                        </span>
-                                    }
-
-                                </td>
-
-                                <td class="text-end fw-semibold">
-
+                                <td class="text-end fw-semibold @(isIncome ? "text-success" : "text-danger")">
                                     @transaction.Amount.ToString("C")
-
                                 </td>
 
-                                <td class="text-center">
+                                <td>@transaction.TransactionDate.ToString("dd/MM/yyyy")</td>
 
+                                <td class="text-center text-nowrap">
                                     <a asp-action="Edit"
                                        asp-route-id="@transaction.Id"
                                        class="btn btn-sm btn-outline-warning">
-
                                         <i class="bi bi-pencil"></i>
-
+                                        Editar
                                     </a>
 
                                     <a asp-action="Delete"
@@ -118,9 +159,7 @@
                                         <i class="bi bi-trash"></i>
                                         Excluir
                                     </a>
-
                                 </td>
-
                             </tr>
                         }
 
@@ -128,6 +167,15 @@
 
                 </table>
 
+            </div>
+
+            <div class="card-footer d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <small class="text-muted">
+                    Exibindo @firstItem–@lastItem de @Model.TotalCount
+                    · Página @Model.Page de @Model.TotalPages
+                </small>
+
+                <partial name="_Pagination" model="Model" />
             </div>
 
         </div>
