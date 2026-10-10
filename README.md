@@ -86,12 +86,13 @@ O projeto evolui de forma incremental, seguindo uma abordagem semelhante ao dese
 
 - ✅ Saldo atual, total de receitas e total de despesas
 - ✅ Últimas transações
+- ✅ Gráfico de despesas por categoria no mês
+- ✅ Gráfico de receitas e despesas dos últimos 6 meses
 
 ---
 
 ## 🚧 Em desenvolvimento
 
-- Gráficos no dashboard
 - Metas financeiras
 - Relatórios financeiros
 - Perfil do usuário
@@ -120,7 +121,8 @@ SmartWallet
 │   ├── Enums
 │   ├── Exceptions
 │   ├── Filters
-│   └── Interfaces
+│   ├── Interfaces
+│   └── Reports
 │ 
 ├── SmartWallet.Infrastructure
 │   ├── Configurations
@@ -191,6 +193,7 @@ SQL Server
 - HTML5
 - CSS3
 - JavaScript (ES6)
+- Chart.js
 - Fetch API
 
 ## Segurança e Autenticação
@@ -280,6 +283,18 @@ Depois, crie uma conta em **Cadastrar**. As categorias padrão são criadas auto
 
 ---
 
+## Executar com Docker
+
+Sem instalar .NET nem SQL Server, apenas com o Docker:
+
+```bash
+docker compose up --build
+```
+
+A aplicação fica disponível em `http://localhost:8080`, com um SQL Server próprio em outro container. Para definir a senha do banco, use a variável `MSSQL_SA_PASSWORD`.
+
+---
+
 ## Configurações opcionais
 
 | Chave | Efeito |
@@ -327,7 +342,7 @@ Prefira `dotnet user-secrets` ou variáveis de ambiente para esses valores, em v
 - [x] Indicadores financeiros reais
 - [x] Últimas transações
 - [ ] Metas financeiras
-- [ ] Gráficos
+- [x] Gráficos
 
 ---
 
@@ -372,6 +387,7 @@ Prefira `dotnet user-secrets` ou variáveis de ambiente para esses valores, em v
 - [x] Testes unitários
 - [x] Testes de integração
 - [x] CI com GitHub Actions
+- [x] Docker Compose (aplicação + SQL Server)
 - [ ] Deploy
 
 ---
@@ -399,8 +415,8 @@ A cada push e pull request na `master`, o GitHub Actions compila a solução e e
 
 Status atual:
 
-✅ 41 testes unitários aprovados  
-✅ 14 testes de integração aprovados
+✅ 46 testes unitários aprovados  
+✅ 16 testes de integração aprovados
 
 ---
 

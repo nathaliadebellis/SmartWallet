@@ -2,6 +2,7 @@
 using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Filters;
 using SmartWallet.Domain.Interfaces;
+using SmartWallet.Domain.Reports;
 using SmartWallet.Infrastructure.Data;
 
 namespace SmartWallet.Infrastructure.Repositories;
@@ -98,6 +99,54 @@ public class FinancialTransactionRepository : IFinancialTransactionRepository
             .ThenByDescending(t => t.Id)
             .Take(count)
             .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<CategoryTotal>> GetExpenseTotalsByCategoryAsync(
+        string userId,
+        DateTime from,
+        DateTime to)
+    {
+        var totals = await _context.FinancialTransactions
+            .Where(t => t.ApplicationUserId == userId
+                && t.Type == Domain.Enums.TransactionType.Expense
+                && t.TransactionDate >= from
+                && t.TransactionDate < to)
+            .GroupBy(t => new { t.CategoryId, t.Category.Name })
+            .Select(g => new
+            {
+                g.Key.Name,
+                Total = g.Sum(t => t.Amount)
+            })
+            .OrderByDescending(g => g.Total)
+            .ToListAsync();
+
+        return totals
+            .Select(t => new CategoryTotal(t.Name, t.Total))
+            .ToList();
+    }
+
+    public async Task<IReadOnlyList<MonthlyTotal>> GetMonthlyTotalsAsync(
+        string userId,
+        DateTime from,
+        DateTime to)
+    {
+        var totals = await _context.FinancialTransactions
+            .Where(t => t.ApplicationUserId == userId
+                && t.TransactionDate >= from
+                && t.TransactionDate < to)
+            .GroupBy(t => new { t.TransactionDate.Year, t.TransactionDate.Month, t.Type })
+            .Select(g => new
+            {
+                g.Key.Year,
+                g.Key.Month,
+                g.Key.Type,
+                Total = g.Sum(t => t.Amount)
+            })
+            .ToListAsync();
+
+        return totals
+            .Select(t => new MonthlyTotal(t.Year, t.Month, t.Type, t.Total))
+            .ToList();
     }
 
     public async Task AddAsync(FinancialTransaction transaction)

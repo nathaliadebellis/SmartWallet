@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace SmartWallet.Web.Controllers
 {
     [Authorize]
-    public class ReportController : Controller
+    public class ReportsController : Controller
     {
         public IActionResult Index()
         {

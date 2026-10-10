@@ -1,0 +1,33 @@
+# Ambiente local completo: aplicação + SQL Server.
+# Uso: docker compose up --build  ->  http://localhost:8080
+#
+# A senha abaixo é apenas um padrão para desenvolvimento local.
+# Para trocá-la, defina MSSQL_SA_PASSWORD no ambiente ou em um arquivo .env.
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-SmartWallet_Dev_2026!}
+    volumes:
+      - smartwallet-db:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -b -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: Server=db;Database=SmartWalletDb;User Id=sa;Password=${MSSQL_SA_PASSWORD:-SmartWallet_Dev_2026!};TrustServerCertificate=True
+    ports:
+      - "8080:8080"
+
+volumes:
+  smartwallet-db:

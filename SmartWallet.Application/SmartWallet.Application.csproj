@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SmartWallet.Domain\SmartWallet.Domain.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Exceptions\" />
+    <ProjectReference Include="..\SmartWallet.Domain\SmartWallet.Domain.csproj" />
   </ItemGroup>
 
 </Project>
