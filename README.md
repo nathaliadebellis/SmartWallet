@@ -7,6 +7,7 @@
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET_Core-512BD4?style=for-the-badge)
 ![Entity Framework Core](https://img.shields.io/badge/EF_Core-68217A?style=for-the-badge)
 ![SQL Server](https://img.shields.io/badge/SQL_Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
+![CI](https://img.shields.io/github/actions/workflow/status/nathaliadebellis/SmartWallet/ci.yml?branch=master&style=for-the-badge&label=CI)
 ![License](https://img.shields.io/github/license/nathaliadebellis/SmartWallet?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-orange?style=for-the-badge)
 
@@ -58,23 +59,44 @@ O projeto evolui de forma incremental, seguindo uma abordagem semelhante ao dese
 
 ## 💸 Transações Financeiras
 
-- ✅ Cadastro
+- ✅ Cadastro, listagem, edição e exclusão
 - ✅ Associação com categorias
 - ✅ Validação de dados
 - ✅ Observações opcionais
 - ✅ Carregamento dinâmico das categorias conforme o tipo da transação
+- ✅ Pesquisa por texto
+- ✅ Filtros por tipo, categoria e período
+- ✅ Paginação
+
+---
+
+## 🔐 Autenticação e Segurança
+
+- ✅ Cadastro, login e logout com ASP.NET Core Identity
+- ✅ Recuperação de senha por e-mail
+- ✅ Política de senha e bloqueio após tentativas inválidas
+- ✅ Isolamento de dados por usuário
+- ✅ Categorias padrão criadas no cadastro
+- ✅ Autorização e antiforgery aplicados globalmente
+- ✅ Headers de segurança e HSTS
+
+---
+
+## 📊 Dashboard
+
+- ✅ Saldo atual, total de receitas e total de despesas
+- ✅ Últimas transações
 
 ---
 
 ## 🚧 Em desenvolvimento
 
-- Dashboard com dados reais
-- Gestão completa de transações
+- Gráficos no dashboard
 - Metas financeiras
 - Relatórios financeiros
 - Perfil do usuário
 - Exportação de dados
-- Multiusuário com isolamento de dados
+- Deploy
 
 ---
 
@@ -88,7 +110,6 @@ SmartWallet
 
 ├── SmartWallet.Application
 │   ├── DTOs
-│   ├── Exceptions
 │   ├── Interfaces
 │   ├── Mappings
 │   └── Services
@@ -98,6 +119,7 @@ SmartWallet
 │   ├── Entities
 │   ├── Enums
 │   ├── Exceptions
+│   ├── Filters
 │   └── Interfaces
 │ 
 ├── SmartWallet.Infrastructure
@@ -105,13 +127,21 @@ SmartWallet
 │   ├── Data
 │   ├── Identity
 │   ├── Migrations
-│   └── Repositories
+│   ├── Repositories
+│   └── Services
 │
-└── SmartWallet.Web
-    ├── Controllers
-    ├── ViewModels
-    ├── Views
-    └── wwwroot
+├── SmartWallet.Web
+│   ├── Binders
+│   ├── Controllers
+│   ├── Extensions
+│   ├── Localization
+│   ├── Middleware
+│   ├── ViewModels
+│   ├── Views
+│   └── wwwroot
+│
+├── SmartWallet.UnitTests
+└── SmartWallet.IntegrationTests
 ```
 
 ---
@@ -167,7 +197,8 @@ SQL Server
 
 - ASP.NET Core Identity
 - Authentication Cookies
-- Authorization Policies
+- Filtro global de autorização
+- Validação global de antiforgery token
 
 ---
 
@@ -175,6 +206,7 @@ SQL Server
 
 - Arquitetura em camadas
 - Repository Pattern
+- Unit of Work
 - Service Layer
 - Dependency Injection
 - DTO Pattern
@@ -211,37 +243,20 @@ git clone https://github.com/nathaliadebellis/SmartWallet.git
 
 ---
 
-## Configurar o banco de dados
+## Banco de dados
 
-Atualize a *Connection String* em:
+A aplicação já vem configurada para o SQL Server LocalDB e aplica as migrations automaticamente ao iniciar, então nenhum passo manual é necessário.
+
+Para usar outra instância do SQL Server, altere a *Connection String* `DefaultConnection` em:
 
 ```text
 SmartWallet.Web/appsettings.json
 ```
 
-Exemplo:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=SmartWalletDb;Trusted_Connection=True;TrustServerCertificate=True"
-  }
-}
-```
-
----
-
-## Criar o banco de dados
-
-### Package Manager Console
-
-```powershell
-Update-Database
-```
-
-### Ou utilizando a CLI
+Se preferir aplicar as migrations manualmente:
 
 ```bash
+dotnet tool restore
 dotnet ef database update --project SmartWallet.Infrastructure --startup-project SmartWallet.Web
 ```
 
@@ -260,6 +275,19 @@ F5
 ```bash
 dotnet run --project SmartWallet.Web
 ```
+
+Depois, crie uma conta em **Cadastrar**. As categorias padrão são criadas automaticamente.
+
+---
+
+## Configurações opcionais
+
+| Chave | Efeito |
+|---|---|
+| `Email:Smtp` | Habilita o envio real de e-mails de recuperação de senha. Sem ela, o e-mail não é enviado e o evento é apenas registrado no log. |
+| `Seed:AdminPassword` | Em ambiente de desenvolvimento, cria o usuário `admin@smartwallet.com` com a senha informada. |
+
+Prefira `dotnet user-secrets` ou variáveis de ambiente para esses valores, em vez do `appsettings.json`.
 
 ---
 
@@ -286,7 +314,8 @@ dotnet run --project SmartWallet.Web
 - [x] Cadastro de usuários
 - [x] Logout
 - [x] Recuperação de senha
-- [x] Perfil do usuário
+- [x] Isolamento de dados por usuário
+- [ ] Perfil do usuário
 
 ---
 
@@ -295,8 +324,8 @@ dotnet run --project SmartWallet.Web
 - [x] Dashboard autenticado
 - [x] Boas-vindas ao usuário logado
 - [x] Cards financeiros
-- [ ] Indicadores financeiros reais
-- [ ] Últimas transações
+- [x] Indicadores financeiros reais
+- [x] Últimas transações
 - [ ] Metas financeiras
 - [ ] Gráficos
 
@@ -308,7 +337,7 @@ dotnet run --project SmartWallet.Web
 - [x] Listagem
 - [x] Edição
 - [x] Exclusão
-- [x] Pesquisa
+- [x] Pesquisa e filtros
 - [x] Paginação
 
 ---
@@ -341,8 +370,8 @@ dotnet run --project SmartWallet.Web
 ## 🧪 Qualidade
 
 - [x] Testes unitários
-- [ ] Testes de integração
-- [ ] CI/CD
+- [x] Testes de integração
+- [x] CI com GitHub Actions
 - [ ] Deploy
 
 ---
@@ -353,14 +382,25 @@ Atualmente o projeto possui:
 
 - Testes de Domínio
 - Testes da Camada Application
+- Testes de integração com `WebApplicationFactory`, cobrindo autenticação, antiforgery e isolamento de dados entre usuários
 - xUnit
 - FluentAssertions
 - Moq
 
+Para executar:
+
+```bash
+dotnet test
+```
+
+Os testes de integração sobem a aplicação real contra um banco SQL Server temporário, criado pelas migrations e removido ao final. Por padrão usam o LocalDB; para outra instância, defina a variável de ambiente `SMARTWALLET_TEST_CONNECTION` com a connection string (sem o nome do banco).
+
+A cada push e pull request na `master`, o GitHub Actions compila a solução e executa todos os testes.
+
 Status atual:
 
-✅ 42 testes executados
-✅ 42 testes aprovados
+✅ 41 testes unitários aprovados  
+✅ 14 testes de integração aprovados
 
 ---
 

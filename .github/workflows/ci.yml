@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      # Senha descartável, usada apenas pelo container SQL Server deste job.
+      MSSQL_SA_PASSWORD: SmartWallet_CI_2026!
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: SmartWallet_CI_2026!
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'SmartWallet_CI_2026!' -C -b -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+          --health-start-period 20s
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore SmartWallet.slnx
+
+      - name: Build
+        run: dotnet build SmartWallet.slnx --configuration Release --no-restore
+
+      - name: Unit tests
+        run: dotnet test SmartWallet.UnitTests --configuration Release --no-build
+
+      - name: Integration tests
+        run: dotnet test SmartWallet.IntegrationTests --configuration Release --no-build
+        env:
+          SMARTWALLET_TEST_CONNECTION: Server=localhost,1433;User Id=sa;Password=${{ env.MSSQL_SA_PASSWORD }};TrustServerCertificate=True

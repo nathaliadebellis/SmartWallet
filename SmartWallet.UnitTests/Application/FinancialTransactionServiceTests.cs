@@ -9,6 +9,7 @@ using SmartWallet.Application.Services;
 using SmartWallet.Domain.Entities;
 using SmartWallet.Domain.Enums;
 using SmartWallet.Domain.Exceptions;
+using SmartWallet.Domain.Filters;
 using SmartWallet.Domain.Interfaces;
 using Xunit;
 
@@ -252,5 +253,107 @@ public class FinancialTransactionServiceTests
 
         // Assert
         _repoMock.Verify(r => r.DeleteAsync(existing), Times.Once);
+    }
+
+    private void SetupSearch(System.Action<TransactionFilter>? capture = null, int total = 0, int page = 1, int pageSize = 10)
+    {
+        _repoMock.Setup(r => r.SearchByUserAsync(UserId, It.IsAny<TransactionFilter>()))
+            .Callback<string, TransactionFilter>((_, f) => capture?.Invoke(f))
+            .ReturnsAsync((string _, TransactionFilter f) => new PagedResult<FinancialTransaction>
+            {
+                Items = total == 0 ? new List<FinancialTransaction>() : new List<FinancialTransaction> { NewTransaction("A") },
+                Page = f.Page,
+                PageSize = f.PageSize,
+                TotalCount = total
+            });
+    }
+
+    [Fact]
+    public async Task SearchAsync_ShouldPassFiltersAndScopeToUser()
+    {
+        // Arrange
+        TransactionFilter? captured = null;
+        SetupSearch(f => captured = f, total: 1);
+
+        var dto = new TransactionFilterDto
+        {
+            Search = "mercado",
+            Type = TransactionType.Expense,
+            CategoryId = 3,
+            From = new System.DateTime(2026, 1, 1),
+            To = new System.DateTime(2026, 1, 31),
+            Page = 2,
+            PageSize = 20
+        };
+
+        // Act
+        var result = await CreateService().SearchAsync(dto, UserId);
+
+        // Assert
+        captured.Should().NotBeNull();
+        captured!.Search.Should().Be("mercado");
+        captured.Type.Should().Be(TransactionType.Expense);
+        captured.CategoryId.Should().Be(3);
+        captured.Page.Should().Be(2);
+        captured.PageSize.Should().Be(20);
+        result.Items.Should().HaveCount(1);
+        _repoMock.Verify(r => r.SearchByUserAsync(UserId, It.IsAny<TransactionFilter>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task SearchAsync_ShouldNormalizePageSizeAndPage()
+    {
+        // Arrange
+        TransactionFilter? captured = null;
+        SetupSearch(f => captured = f);
+
+        // Act
+        await CreateService().SearchAsync(new TransactionFilterDto { Page = -5, PageSize = 100000 }, UserId);
+
+        // Assert
+        captured!.Page.Should().Be(1);
+        captured.PageSize.Should().Be(FinancialTransactionService.MaxPageSize);
+    }
+
+    [Fact]
+    public async Task SearchAsync_WhenFromIsAfterTo_ShouldSwapDates()
+    {
+        // Arrange
+        TransactionFilter? captured = null;
+        SetupSearch(f => captured = f);
+
+        var dto = new TransactionFilterDto
+        {
+            From = new System.DateTime(2026, 2, 1),
+            To = new System.DateTime(2026, 1, 1)
+        };
+
+        // Act
+        await CreateService().SearchAsync(dto, UserId);
+
+        // Assert
+        captured!.From.Should().Be(new System.DateTime(2026, 1, 1));
+        captured.To.Should().Be(new System.DateTime(2026, 2, 1));
+    }
+
+    [Fact]
+    public async Task SearchAsync_WhenPageIsBeyondLastPage_ShouldReturnLastPage()
+    {
+        // Arrange: 11 items with page size 10 => 2 pages; page 5 returns empty
+        _repoMock.Setup(r => r.SearchByUserAsync(UserId, It.IsAny<TransactionFilter>()))
+            .ReturnsAsync((string _, TransactionFilter f) => new PagedResult<FinancialTransaction>
+            {
+                Items = f.Page > 2 ? new List<FinancialTransaction>() : new List<FinancialTransaction> { NewTransaction("A") },
+                Page = f.Page,
+                PageSize = f.PageSize,
+                TotalCount = 11
+            });
+
+        // Act
+        var result = await CreateService().SearchAsync(new TransactionFilterDto { Page = 5, PageSize = 10 }, UserId);
+
+        // Assert
+        result.Page.Should().Be(2);
+        result.Items.Should().NotBeEmpty();
     }
 }
