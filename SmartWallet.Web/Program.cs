@@ -148,9 +148,12 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
 
-        logger.LogError(
+        logger.LogCritical(
             ex,
-            "Erro durante aplicação das migrations ou seed do Identity.");
+            "Erro durante aplicação das migrations ou seed do Identity. A aplicação não será iniciada.");
+
+        // Sem banco atualizado a aplicação falharia em toda requisição; melhor não subir.
+        throw;
     }
 }
 
