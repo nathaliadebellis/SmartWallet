@@ -4,11 +4,15 @@ namespace SmartWallet.Application.DTOs.Dashboard;
 
 public class DashboardDto
 {
-    public decimal TotalReceitas { get; set; }
+    public decimal TotalIncome { get; set; }
 
-    public decimal TotalDespesas { get; set; }
+    public decimal TotalExpenses { get; set; }
 
-    public decimal SaldoAtual { get; set; }
+    public decimal CurrentBalance { get; set; }
 
-    public List<RecentTransactionDto> UltimasTransacoes { get; set; } = new();
+    public List<RecentTransactionDto> RecentTransactions { get; set; } = new();
+
+    public List<CategoryExpenseDto> ExpensesByCategory { get; set; } = new();
+
+    public List<MonthlySummaryDto> MonthlySummary { get; set; } = new();
 }

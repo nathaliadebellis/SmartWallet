@@ -259,3 +259,12 @@ img {
         margin-bottom: 1rem;
     }
 }
+
+.chart-container {
+    position: relative;
+    width: 100%;
+}
+
+.chart-table summary {
+    cursor: pointer;
+}

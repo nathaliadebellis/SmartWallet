@@ -3,13 +3,15 @@
 @{
     Layout = "_DashboardLayout";
     ViewData["Title"] = "Dashboard";
+
+    var categoryChartHeight = Model.ExpensesByCategory.Count * 36 + 48;
 }
 
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-12">
             <h1>Dashboard</h1>
-            <p class="lead">Bem-vindo ao SmartWallet, @Model.NomeUsuario!</p>
+            <p class="lead">Bem-vindo ao SmartWallet, @Model.UserName!</p>
         </div>
     </div>
 
@@ -18,7 +20,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Saldo Atual</h5>
-                    <p class="card-text display-6">@Model.SaldoAtual.ToString("C", CultureInfo.CurrentCulture)</p>
+                    <p class="card-text display-6">@Model.CurrentBalance.ToString("C", CultureInfo.CurrentCulture)</p>
                 </div>
             </div>
         </div>
@@ -27,7 +29,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Receitas</h5>
-                    <p class="card-text display-6 text-success">@Model.TotalReceitas.ToString("C", CultureInfo.CurrentCulture)</p>
+                    <p class="card-text display-6 text-success">@Model.TotalIncome.ToString("C", CultureInfo.CurrentCulture)</p>
                 </div>
             </div>
         </div>
@@ -36,7 +38,95 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Despesas</h5>
-                    <p class="card-text display-6 text-danger">@Model.TotalDespesas.ToString("C", CultureInfo.CurrentCulture)</p>
+                    <p class="card-text display-6 text-danger">@Model.TotalExpenses.ToString("C", CultureInfo.CurrentCulture)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-1">Despesas por categoria</h5>
+                    <p class="text-muted small">@Model.CurrentMonthLabel</p>
+
+                    @if (Model.ExpensesByCategory.Any())
+                    {
+                        <div class="chart-container" style="height: @(categoryChartHeight)px">
+                            <canvas id="expensesByCategoryChart" role="img"
+                                    aria-label="Gráfico de barras com o total de despesas por categoria em @Model.CurrentMonthLabel"></canvas>
+                        </div>
+
+                        <details class="chart-table mt-3">
+                            <summary class="small text-muted">Ver dados em tabela</summary>
+                            <table class="table table-sm mt-2 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th class="text-end">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.ExpensesByCategory)
+                                    {
+                                        <tr>
+                                            <td>@category.CategoryName</td>
+                                            <td class="text-end">@category.Total.ToString("C", CultureInfo.CurrentCulture)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </details>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Nenhuma despesa registrada neste mês.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-1">Receitas e despesas por mês</h5>
+                    <p class="text-muted small">Últimos @Model.MonthlySummary.Count meses</p>
+
+                    @if (Model.HasMonthlySummary)
+                    {
+                        <div class="chart-container" style="height: 264px">
+                            <canvas id="monthlySummaryChart" role="img"
+                                    aria-label="Gráfico de colunas com receitas e despesas dos últimos @Model.MonthlySummary.Count meses"></canvas>
+                        </div>
+
+                        <details class="chart-table mt-3">
+                            <summary class="small text-muted">Ver dados em tabela</summary>
+                            <table class="table table-sm mt-2 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th class="text-end">Receitas</th>
+                                        <th class="text-end">Despesas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var month in Model.MonthlySummary)
+                                    {
+                                        <tr>
+                                            <td>@month.Label</td>
+                                            <td class="text-end">@month.Income.ToString("C", CultureInfo.CurrentCulture)</td>
+                                            <td class="text-end">@month.Expenses.ToString("C", CultureInfo.CurrentCulture)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </details>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Nenhuma transação registrada neste período.</p>
+                    }
                 </div>
             </div>
         </div>
@@ -45,7 +135,7 @@
     <div class="row mt-4">
         <div class="col-12">
             <h4>Últimas transações</h4>
-            @if (Model.UltimasTransacoes != null && Model.UltimasTransacoes.Any())
+            @if (Model.RecentTransactions.Any())
             {
                 <div class="table-responsive">
                     <table class="table table-striped">
@@ -58,7 +148,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var t in Model.UltimasTransacoes)
+                            @foreach (var t in Model.RecentTransactions)
                             {
                                 <tr>
                                     <td>@t.TransactionDate.ToString("dd/MM/yyyy")</td>
@@ -82,15 +172,17 @@
             }
         </div>
     </div>
-
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <h4>Gráfico de despesas por categoria</h4>
-            <p class="text-muted">Em breve: gráfico de despesas por categoria.</p>
-        </div>
-        <div class="col-md-6">
-            <h4>Resumo financeiro mensal</h4>
-            <p class="text-muted">Em breve: resumo financeiro mensal.</p>
-        </div>
-    </div>
 </div>
+
+<script type="application/json" id="dashboardChartData">
+    @Html.Raw(Json.Serialize(new
+    {
+        expensesByCategory = Model.ExpensesByCategory.Select(c => new { label = c.CategoryName, total = c.Total }),
+        monthlySummary = Model.MonthlySummary.Select(m => new { label = m.Label, income = m.Income, expenses = m.Expenses })
+    }))
+</script>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

@@ -54,3 +54,29 @@ jobs:
         run: dotnet test SmartWallet.IntegrationTests --configuration Release --no-build
         env:
           SMARTWALLET_TEST_CONNECTION: Server=localhost,1433;User Id=sa;Password=${{ env.MSSQL_SA_PASSWORD }};TrustServerCertificate=True
+
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build and start containers
+        run: docker compose up --build --detach --wait --wait-timeout 180
+
+      - name: Smoke test
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail --output /dev/null http://localhost:8080/; then
+              echo "Application is responding."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "Application did not respond in time."
+          exit 1
+
+      - name: Container logs
+        if: failure()
+        run: docker compose logs
